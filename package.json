@@ -1,7 +1,7 @@
 {
-  "name": "proxy-la12",
+  "name": "proxy-reverso-la12hd",
   "version": "1.0.0",
-  "description": "Proxy reverso para la12hd",
+  "description": "Proxy reverso para acessar links bloqueados no Brasil",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -10,5 +10,8 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "request": "^2.88.2"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
 }
