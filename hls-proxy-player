@@ -1,0 +1,5 @@
+// Exemplo em Node.js com Express
+app.get('/proxy', (req, res) => {
+  const targetUrl = decodeURIComponent(req.query.url);
+  request(targetUrl).pipe(res);
+});
