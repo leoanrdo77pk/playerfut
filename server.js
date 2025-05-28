@@ -1,37 +1,37 @@
 const express = require('express');
-const request = require('request');
 const cors = require('cors');
-const app = express();
+const puppeteer = require('puppeteer');
 
+const app = express();
 app.use(cors());
 
-app.get('/proxy', (req, res) => {
-  const targetUrl = req.query.url;
+app.get('/proxy', async (req, res) => {
+  const url = req.query.url;
+  if (!url) return res.status(400).send('URL faltando.');
 
-  if (!targetUrl) {
-    return res.status(400).send('Erro: URL de destino não fornecida.');
+  try {
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      headless: true
+    });
+
+    const page = await browser.newPage();
+    await page.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
+    );
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+
+    const content = await page.content();
+    await browser.close();
+
+    res.send(content);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erro ao renderizar a página.');
   }
-
-  const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-    'Accept': '*/*',
-    'Accept-Language': 'en-US,en;q=0.9',
-  };
-
-  request({
-    url: targetUrl,
-    method: 'GET',
-    headers: headers,
-    followAllRedirects: true,
-  })
-    .on('error', (err) => {
-      console.error('Erro ao requisitar:', err);
-      res.status(500).send('Erro interno no proxy.');
-    })
-    .pipe(res);
 });
 
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Proxy rodando em http://localhost:${PORT}`);
 });
