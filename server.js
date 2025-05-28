@@ -1,28 +1,33 @@
-const express = require('express');
-const request = require('request');
-const cors = require('cors');
+const express = require("express");
+const request = require("request");
+const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 
-app.get('/proxy', (req, res) => {
+app.get("/proxy", (req, res) => {
   const targetUrl = req.query.url;
-
   if (!targetUrl) {
-    return res.status(400).send('Parâmetro "url" é obrigatório');
+    return res.status(400).send("URL não fornecida.");
   }
 
-  // Stream direto da URL com headers para enganar o servidor de origem
+  // Adiciona headers para tentar permitir iframes
+  res.setHeader("Content-Security-Policy", "frame-ancestors *");
+  res.setHeader("X-Frame-Options", "ALLOWALL");
+
   request({
     url: targetUrl,
     headers: {
-      'User-Agent': 'Mozilla/5.0',
-      'Referer': 'https://la12hd.com/',
-      'Origin': 'https://la12hd.com',
-    }
-  }).pipe(res);
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    },
+  })
+    .on("error", (err) => {
+      res.status(500).send("Erro ao acessar o conteúdo.");
+    })
+    .pipe(res);
 });
 
 app.listen(PORT, () => {
