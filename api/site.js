@@ -2,7 +2,7 @@ const express = require("express");
 const request = require("request");
 const app = express();
 
-app.use("/", (req, res) => {
+app.use("/site", (req, res) => {
   const url = "https://futebol7k.com" + req.url;
 
   request(
