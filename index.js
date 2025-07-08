@@ -14,11 +14,18 @@ module.exports = async (req, res) => {
 
     resp.on('data', chunk => data += chunk);
     resp.on('end', () => {
-      // Reescreve todos os links internos para apontar pro seu domínio
-      data = data.replace(/href="\/([^"]+)"/g, 'href="/$1"');
-      data = data.replace(/href='\/([^']+)'/g, "href='/$1'");
-      data = data.replace(/action="\/([^"]+)"/g, 'action="/$1"');
-      data = data.replace(/<base[^>]*>/g, ''); // remove <base> se tiver
+      // 🔁 Reescreve todos os links e ações para manter o usuário no Vercel
+      data = data
+        // Links absolutos → relativos
+        .replace(/https:\/\/futebol7k\.com\//g, '/')
+        // href='/algo'
+        .replace(/href='\/([^']+)'/g, "href='/$1'")
+        // href="/algo"
+        .replace(/href="\/([^"]+)"/g, 'href="/$1"')
+        // action="/algo"
+        .replace(/action="\/([^"]+)"/g, 'action="/$1"')
+        // Remove <base> se existir
+        .replace(/<base[^>]*>/gi, '');
 
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
