@@ -7,51 +7,25 @@ module.exports = async (req, res) => {
   https.get(targetUrl, {
     headers: {
       'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-      'Referer': 'https://futebol7k.com',
+      'Referer': 'https://futebol7k.com'
     }
   }, (resp) => {
     let data = '';
+    const contentType = resp.headers['content-type'] || 'text/html';
 
     resp.on('data', chunk => data += chunk);
     resp.on('end', () => {
-      // 🔁 Reescreve todos os links e ações para manter o usuário no Vercel
-      data = data
-        // Links absolutos → relativos
-        .replace(/https:\/\/futebol7k\.com\//g, '/')
-        // href='/algo'
-        .replace(/href='\/([^']+)'/g, "href='/$1'")
-        // href="/algo"
-        .replace(/href="\/([^"]+)"/g, 'href="/$1"')
-        // action="/algo"
-        .replace(/action="\/([^"]+)"/g, 'action="/$1"')
-        // Remove <base> se existir
-        .replace(/<base[^>]*>/gi, '');
+      if (contentType.includes('text/html')) {
+        // Reescreve os links
+        data = data
+          .replace(/https:\/\/futebol7k\.com\//g, '/')
+          .replace(/href='\/([^']+)'/g, "href='/$1'")
+          .replace(/href="\/([^"]+)"/g, 'href="/$1"')
+          .replace(/action="\/([^"]+)"/g, 'action="/$1"')
+          .replace(/<base[^>]*>/gi, '');
 
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
-      res.statusCode = 200;
-      res.end(data);
-    });
-  }).on("error", (err) => {
-    console.error("Erro:", err.message);
-    res.statusCode = 500;
-    res.end("Erro ao carregar conteúdo");
-  });
-};
-
-
-
-
-
-
-
-
-
-
-
-
-// Script do banner como string segura
-const bannerScript = `
+        // Injeta o banner
+        const bannerScript = `
 <script>
 (function () {
   const url = "https://8xbet86.com/";
@@ -94,10 +68,17 @@ const bannerScript = `
 </script>
 `;
 
-// Injeta antes de </body> apenas se encontrar a tag
-if (data.includes('</body>')) {
-  data = data.replace('</body>', bannerScript + '</body>');
-} else {
-  // Se não tiver </body>, injeta no fim mesmo assim
-  data += bannerScript;
-}
+        data = data.replace('</body>', `${bannerScript}</body>`);
+      }
+
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Content-Type', contentType);
+      res.statusCode = 200;
+      res.end(data);
+    });
+  }).on("error", (err) => {
+    console.error("Erro ao carregar:", err.message);
+    res.statusCode = 500;
+    res.end("Erro ao carregar conteúdo");
+  });
+};
