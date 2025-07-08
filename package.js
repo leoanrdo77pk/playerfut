@@ -1,5 +1,5 @@
 {
-  "name": "proxy-futebol7k",
+  "name": "futebol-proxy",
   "version": "1.0.0",
   "dependencies": {
     "axios": "^1.6.0"
