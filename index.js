@@ -68,6 +68,18 @@ ${data}
       }
 
 
+      
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
+      res.statusCode = 200;
+      res.end(finalHtml);
+    });
+  }).on("error", (err) => {
+    console.error("Erro:", err.message);
+    res.statusCode = 500;
+    res.end("Erro ao carregar conteúdo");
+  });
+};
 
 
 
@@ -157,26 +169,3 @@ ${data}
   window.addEventListener("DOMContentLoaded", schedulePopup);
 })();
 </script>
-
-
-
-
-
-
-
-
-
-
-
-      
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
-      res.statusCode = 200;
-      res.end(finalHtml);
-    });
-  }).on("error", (err) => {
-    console.error("Erro:", err.message);
-    res.statusCode = 500;
-    res.end("Erro ao carregar conteúdo");
-  });
-};
