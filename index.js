@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
 
     resp.on('data', chunk => data += chunk);
     resp.on('end', () => {
-      // Reescreve links e ações para manter no domínio do Vercel
+      // Reescreve links para manter no domínio Vercel
       data = data
         .replace(/https:\/\/futebol7k\.com\//g, '/')
         .replace(/href='\/([^']+)'/g, "href='/$1'")
@@ -22,48 +22,50 @@ module.exports = async (req, res) => {
         .replace(/action="\/([^"]+)"/g, 'action="/$1"')
         .replace(/<base[^>]*>/gi, '');
 
-      // Script JS que injeta o footer dinamicamente
-      const bannerScript = `
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const footer = document.createElement("div");
-  footer.id = "custom-footer";
-  footer.innerHTML = \`
+      // Injeção segura de banner no final do body com verificação
+      let finalHtml;
+      if (data.includes('</body>')) {
+        finalHtml = data.replace('</body>', `
+  <div id="custom-footer">
     <a href="https://8xbet86.com/" target="_blank">
-      <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner de Anúncio" />
+      <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
     </a>
-  \`;
-  document.body.appendChild(footer);
-
-  const style = document.createElement("style");
-  style.innerHTML = \`
+  </div>
+  <style>
     #custom-footer {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      z-index: 9999;
       background: transparent;
       text-align: center;
-      padding: 0;
+      z-index: 9999;
     }
-    #custom-footer img {
-      width: 100%;
-      max-height: 100px;
-      object-fit: contain;
-      cursor: pointer;
-    }
-    body {
-      padding-bottom: 120px !important;
-    }
-  \`;
-  document.head.appendChild(style);
-});
-</script>
-</body>`;
-
-      // Injeta o banner script antes da tag </body>
-      const finalHtml = data.replace('</body>', bannerScript);
+    body { padding-bottom: 120px !important; }
+  </style>
+</body>`);
+      } else {
+        // Se não tiver </body>, adiciona manualmente
+        finalHtml = `
+${data}
+<div id="custom-footer">
+  <a href="https://8xbet86.com/" target="_blank">
+    <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
+  </a>
+</div>
+<style>
+  #custom-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: transparent;
+    text-align: center;
+    z-index: 9999;
+  }
+  body { padding-bottom: 120px !important; }
+</style>`;
+      }
 
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
