@@ -22,81 +22,61 @@ module.exports = async (req, res) => {
         .replace(/action="\/([^"]+)"/g, 'action="/$1"')
         .replace(/<base[^>]*>/gi, '');
 
-      // Overlay banner HTML + CSS + JS
-      const overlayCode = `
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  // Cria o overlay
-  const overlay = document.createElement('div');
-  overlay.id = 'custom-overlay-banner';
-
-  // Conteúdo do banner
-  overlay.innerHTML = \`
-    <a href="https://8xbet86.com/" target="_blank" style="display:block;">
-      <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner" style="max-width: 300px; width: 90vw; cursor: pointer;" />
+      // Injeção segura de banner no final do body com verificação
+      let finalHtml;
+      if (data.includes('</body>')) {
+        finalHtml = data.replace('</body>', `
+  <div id="custom-footer">
+    <a href="https://8xbet86.com/" target="_blank">
+      <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
     </a>
-    <button id="close-overlay" aria-label="Fechar banner" title="Fechar" style="
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      background: rgba(0,0,0,0.5);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 26px;
-      height: 26px;
-      font-weight: bold;
-      cursor: pointer;
-      ">×</button>
-  \`;
-
-  // Estilo do overlay
-  const style = document.createElement('style');
-  style.textContent = \`
-    #custom-overlay-banner {
+  </div>
+  <style>
+    #custom-footer {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(0,0,0,0.6);
-      padding: 5px;
-      border-radius: 8px;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: transparent;
+      text-align: center;
       z-index: 9999;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      max-width: 320px;
     }
-    #custom-overlay-banner img {
-      border-radius: 5px;
-      display: block;
-    }
-    #close-overlay:hover {
-      background: rgba(0,0,0,0.8);
-    }
-  \`;
-  document.head.appendChild(style);
+    body { padding-bottom: 120px !important; }
+  </style>
+</body>`);
+      } else {
+        // Se não tiver </body>, adiciona manualmente
+        finalHtml = `
+${data}
+<div id="custom-footer">
+  <a href="https://8xbet86.com/" target="_blank">
+    <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
+  </a>
+</div>
+<style>
+  #custom-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: transparent;
+    text-align: center;
+    z-index: 9999;
+  }
+  body { padding-bottom: 120px !important; }
+</style>`;
+      }
 
-  // Fecha o overlay ao clicar no botão
-  overlay.querySelector('#close-overlay').addEventListener('click', () => {
-    overlay.remove();
-  });
 
-  document.body.appendChild(overlay);
-});
-</script>
-</body>`;
-
-      // Injeta o overlay antes do fechamento do </body>
-      const finalHtml = data.includes('</body>') ? data.replace('</body>', overlayCode) : data + overlayCode;
-
+      
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
       res.statusCode = 200;
       res.end(finalHtml);
     });
-  }).on('error', (err) => {
-    console.error('Erro:', err.message);
+  }).on("error", (err) => {
+    console.error("Erro:", err.message);
     res.statusCode = 500;
-    res.end('Erro ao carregar conteúdo');
+    res.end("Erro ao carregar conteúdo");
   });
 };
