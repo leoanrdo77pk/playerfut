@@ -15,6 +15,15 @@ module.exports = async (req, res) => {
 
     response.on('data', chunk => data += chunk);
     response.on('end', () => {
+      if (contentType.includes('text/html')) {
+        // Reescreve links absolutos para manter no Vercel
+        data = data
+          .replace(/https:\/\/futebol7k\.com\//g, '/proxy/')
+          .replace(/href="\/([^"]+)"/g, 'href="/proxy/$1"')
+          .replace(/href='\/([^']+)'/g, "href='/proxy/$1'")
+          .replace(/<base[^>]*>/gi, '');
+      }
+
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', contentType);
       res.status(200).send(data);
