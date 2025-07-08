@@ -22,8 +22,6 @@ module.exports = async (req, res) => {
         .replace(/action="\/([^"]+)"/g, 'action="/$1"')
         .replace(/<base[^>]*>/gi, '');
 
-      // Substitui o código do banner para carregar o script externo
-      data = data.replace('</body>', '<script src="/banner.js"></script></body>');
 
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
