@@ -1,38 +1,37 @@
-(function () {
-  const url = "https://8xbet86.com/";
-  const footerImgDesktop = "https://i.imgur.com/Fen20UR.gif";
-  const footerImgMobile = "https://i.imgur.com/JtIJ2hM.gif";
+const bannerScript = `
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const footer = document.createElement("div");
+  footer.id = "custom-footer";
+  footer.innerHTML = \`
+    <a href="https://8xbet86.com/" target="_blank">
+      <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner de Anúncio" />
+    </a>
+  \`;
+  document.body.appendChild(footer);
 
   const style = document.createElement("style");
-  style.textContent = `
-    #catfish-footer {
-      position: fixed; bottom: 0; width: 100%;
-      z-index: 9997; background: transparent;
+  style.innerHTML = \`
+    #custom-footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 9999;
+      background: transparent;
       text-align: center;
+      padding: 10px;
     }
-    #catfish-footer img {
-      width: 100%; max-height: 100px;
+    #custom-footer img {
+      width: 100%;
+      max-height: 100px;
       object-fit: contain;
       cursor: pointer;
     }
-    body { padding-bottom: 100px; }
-  `;
+    body {
+      padding-bottom: 120px !important;
+    }
+  \`;
   document.head.appendChild(style);
-
-  const footer = document.createElement("div");
-  footer.id = "catfish-footer";
-
-  const footerLink = document.createElement("a");
-  footerLink.href = url;
-  footerLink.target = "_blank";
-
-  const footerImgEl = document.createElement("img");
-  footerImgEl.src = window.innerWidth <= 768 ? footerImgMobile : footerImgDesktop;
-
-  footerLink.appendChild(footerImgEl);
-  footer.appendChild(footerLink);
-
-  window.addEventListener("DOMContentLoaded", () => {
-    document.body.appendChild(footer);
-  });
-})();
+});
+</script>
+</body>`;
