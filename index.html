@@ -1,30 +1,77 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  
-  <script>
-(function () {
-  const url = "https://8xbet86.com/";
-  const popupImg = "https://i.imgur.com/8KON1kS.gif";
-  const interval = 5 * 60 * 1000;
-  const storageKey = "popupLastShownTime";
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Futebol Ao Vivo grátis</title>
 
-  const style = document.createElement("style");
-  style.textContent = `
-    #popup-container {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      display: flex; justify-content: center; align-items: center;
-      background: rgba(0, 0, 0, 0.7); z-index: 9998;
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: transparent;
+      overflow: auto; /* Corrige a rolagem no mobile */
     }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    iframe {
+      border: none;
+      width: 100vw;
+      height: 100vh;
+      max-width: 100%;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .banner-link {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      padding: 5px;
+      background-color: rgba(255, 255, 255, 0.0); /* sem fundo */
+    }
+
+    .banner-link img {
+      width: 70vw;
+      max-width: 400px;
+      height: auto;
+      display: block;
+    }
+
+    /* Popup estilos */
+    #popup-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 10000;
+    }
+
     #popup-container .popup-inner {
       position: relative;
     }
+
     #popup-container img {
-      max-width: 90vw; max-height: 90vh;
+      max-width: 90vw;
+      max-height: 90vh;
       border-radius: 8px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
       cursor: pointer;
     }
+
     #popup-close {
       position: absolute;
       top: -10px;
@@ -38,86 +85,8 @@
       border: none;
       cursor: pointer;
       box-shadow: 0 0 5px rgba(0,0,0,0.3);
-      z-index: 10000;
+      z-index: 10001;
     }
-  `;
-  document.head.appendChild(style);
-
-  function showPopup() {
-    localStorage.setItem(storageKey, Date.now().toString());
-
-    const popupContainer = document.createElement("div");
-    popupContainer.id = "popup-container";
-
-    const popupInner = document.createElement("div");
-    popupInner.className = "popup-inner";
-
-    const popupLink = document.createElement("a");
-    popupLink.href = url;
-    popupLink.target = "_blank";
-
-    const popupImgEl = document.createElement("img");
-    popupImgEl.src = popupImg;
-
-    const closeBtn = document.createElement("button");
-    closeBtn.id = "popup-close";
-    closeBtn.textContent = "×";
-    closeBtn.onclick = () => popupContainer.remove();
-
-    popupLink.appendChild(popupImgEl);
-    popupInner.appendChild(popupLink);
-    popupInner.appendChild(closeBtn);
-    popupContainer.appendChild(popupInner);
-    document.body.appendChild(popupContainer);
-  }
-
-  function schedulePopup() {
-    const lastShown = parseInt(localStorage.getItem(storageKey), 10) || 0;
-    const now = Date.now();
-    const timePassed = now - lastShown;
-
-    if (timePassed >= interval) {
-      showPopup();
-      setTimeout(schedulePopup, interval);
-    } else {
-      setTimeout(schedulePopup, interval - timePassed);
-    }
-  }
-
-  window.addEventListener("DOMContentLoaded", schedulePopup);
-})();
-</script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Futebol Ao Vivo grátis</title>
-  <style>
-    html, body {
-      margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
-      background: transparent;
-    }
-    iframe {
-      border: none;
-      width: 100%;
-      height: 100vh;
-      max-width: 100%;
-      display: block;
-    }
-  .banner-link {
-  position: fixed;
-  bottom: 0; /* ou top: 0 se quiser no topo */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-}
-
-.banner-link img {
-  width: 70vw;
-  max-width: 400px;
-  height: auto;
-  display: block;
-}
-
-
   </style>
 </head>
 <body>
@@ -137,6 +106,58 @@
   >
     <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner link" />
   </a>
+
+  <script>
+    (function () {
+      const url = "https://8xbet86.com/";
+      const popupImg = "https://i.imgur.com/8KON1kS.gif";
+      const interval = 5 * 60 * 1000; // 5 minutos
+      const storageKey = "popupLastShownTime";
+
+      function showPopup() {
+        localStorage.setItem(storageKey, Date.now().toString());
+
+        const popupContainer = document.createElement("div");
+        popupContainer.id = "popup-container";
+
+        const popupInner = document.createElement("div");
+        popupInner.className = "popup-inner";
+
+        const popupLink = document.createElement("a");
+        popupLink.href = url;
+        popupLink.target = "_blank";
+
+        const popupImgEl = document.createElement("img");
+        popupImgEl.src = popupImg;
+
+        const closeBtn = document.createElement("button");
+        closeBtn.id = "popup-close";
+        closeBtn.textContent = "×";
+        closeBtn.onclick = () => popupContainer.remove();
+
+        popupLink.appendChild(popupImgEl);
+        popupInner.appendChild(popupLink);
+        popupInner.appendChild(closeBtn);
+        popupContainer.appendChild(popupInner);
+        document.body.appendChild(popupContainer);
+      }
+
+      function schedulePopup() {
+        const lastShown = parseInt(localStorage.getItem(storageKey), 10) || 0;
+        const now = Date.now();
+        const timePassed = now - lastShown;
+
+        if (timePassed >= interval) {
+          showPopup();
+          setTimeout(schedulePopup, interval);
+        } else {
+          setTimeout(schedulePopup, interval - timePassed);
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", schedulePopup);
+    })();
+  </script>
 
 </body>
 </html>
