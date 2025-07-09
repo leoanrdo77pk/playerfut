@@ -8,13 +8,19 @@
     html, body {
       margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
       background: transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
     }
     iframe {
       border: none;
-      width: 100%;
-      height: 100vh;
+      width: 80vw;   /* 80% da largura da viewport */
+      height: 80vh;  /* 80% da altura da viewport */
       max-width: 100%;
       display: block;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      border-radius: 8px;
     }
     .banner-link {
       position: fixed;
