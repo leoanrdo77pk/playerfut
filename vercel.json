@@ -1,16 +1,9 @@
+
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/site.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    {
-      "src": "/api/site",
-      "dest": "api/site.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+  "rewrites": [
+    { 
+      "source": "/site",
+      "destination": "https://futebol7k.com/"
     }
   ]
 }
