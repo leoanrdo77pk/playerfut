@@ -14,15 +14,12 @@ module.exports = async (req, res) => {
 
     resp.on('data', chunk => data += chunk);
     resp.on('end', () => {
-      // Reescreve links
-      data = data
-        .replace(/https:\/\/futebol7k\.com\//g, '/')
-        .replace(/href='\/([^']+)'/g, "href='/$1'")
-        .replace(/href="\/([^"]+)"/g, 'href="/$1"')
-        .replace(/action="\/([^"]+)"/g, 'action="/$1"')
-        .replace(/<base[^>]*>/gi, '');
+      // Adiciona <base href> para manter o site funcionando com links relativos
+      if (!data.includes('<base')) {
+        data = data.replace('<head>', `<head><base href="https://futebol7k.com/">`);
+      }
 
-      // Overlay seguro
+      // Script de overlay leve e seguro
       const overlayScript = `
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -32,70 +29,45 @@ document.addEventListener("DOMContentLoaded", function () {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: rgba(0,0,0,0.6);
+      z-index: 9999;
+      background: rgba(0,0,0,0.7);
       padding: 8px;
       border-radius: 10px;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
     #overlay-banner img {
-      max-width: 250px;
+      max-width: 200px;
       height: auto;
+      cursor: pointer;
       border-radius: 5px;
-      cursor: pointer;
-    }
-    #overlay-close {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      background: #fff;
-      color: #000;
-      border-radius: 50%;
-      width: 25px;
-      height: 25px;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
     }
   \`;
   document.head.appendChild(style);
 
-  const overlay = document.createElement("div");
-  overlay.id = "overlay-banner";
-  overlay.innerHTML = \`
+  const div = document.createElement("div");
+  div.id = "overlay-banner";
+  div.innerHTML = \`
     <a href="https://8xbet86.com/" target="_blank">
       <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner" />
     </a>
-    <button id="overlay-close" title="Fechar">×</button>
   \`;
 
-  overlay.querySelector('#overlay-close').addEventListener('click', () => {
-    overlay.remove();
-  });
-
-  document.body.appendChild(overlay);
+  document.body.appendChild(div);
 });
 </script>`;
 
-      // Injeta no final do body
+      // Injeta o script no final da página, sem mexer no resto
       const finalHtml = data.includes('</body>')
         ? data.replace('</body>', overlayScript + '</body>')
         : data + overlayScript;
 
-      // Cabeçalhos forçados
-      res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.statusCode = 200;
-
-      // Envia como buffer para evitar codificação errada
       res.end(Buffer.from(finalHtml, 'utf-8'));
     });
-  }).on('error', (err) => {
-    console.error('Erro:', err.message);
+  }).on("error", (err) => {
+    console.error("Erro:", err.message);
     res.statusCode = 500;
-    res.end('Erro ao carregar conteúdo');
+    res.end("Erro ao carregar conteúdo");
   });
 };
