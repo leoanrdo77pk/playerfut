@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
 
     resp.on('data', chunk => data += chunk);
     resp.on('end', () => {
-      // Reescreve links para manter no domínio do Vercel
+      // Reescreve links
       data = data
         .replace(/https:\/\/futebol7k\.com\//g, '/')
         .replace(/href='\/([^']+)'/g, "href='/$1'")
@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
         .replace(/action="\/([^"]+)"/g, 'action="/$1"')
         .replace(/<base[^>]*>/gi, '');
 
-      // Script seguro para overlay
+      // Overlay seguro
       const overlayScript = `
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -80,15 +80,18 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>`;
 
-      // Injeta o script no final do body
+      // Injeta no final do body
       const finalHtml = data.includes('</body>')
         ? data.replace('</body>', overlayScript + '</body>')
         : data + overlayScript;
 
+      // Cabeçalhos forçados
       res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.statusCode = 200;
-      res.end(finalHtml);
+
+      // Envia como buffer para evitar codificação errada
+      res.end(Buffer.from(finalHtml, 'utf-8'));
     });
   }).on('error', (err) => {
     console.error('Erro:', err.message);
