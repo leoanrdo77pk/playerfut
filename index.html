@@ -103,17 +103,19 @@
       display: block;
     }
     .banner-link {
-      position: fixed;
-      bottom: 0; /* pode ajustar para top, left, right */
-      left: 0;
-      width: 100%;
-      z-index: 9999;
-    }
-    .banner-link img {
-      width: 70%;
-      height: 40px;
-      display: block;
-    }
+  position: fixed;
+  bottom: 0; /* ou top: 0 se quiser no topo */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+}
+
+.banner-link img {
+  width: 65%;
+  height: 40px;
+  display: block;
+}
+
   </style>
 </head>
 <body>
