@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
 
     resp.on('data', chunk => data += chunk);
     resp.on('end', () => {
-      // Reescreve links para manter no domínio Vercel
+      // Reescreve links para manter no domínio do Vercel
       data = data
         .replace(/https:\/\/futebol7k\.com\//g, '/')
         .replace(/href='\/([^']+)'/g, "href='/$1'")
@@ -22,74 +22,77 @@ module.exports = async (req, res) => {
         .replace(/action="\/([^"]+)"/g, 'action="/$1"')
         .replace(/<base[^>]*>/gi, '');
 
-      // Overlay em cima do conteúdo
-      const overlayCode = `
-<div id="overlay-banner">
-  <a href="https://8xbet86.com/" target="_blank">
-    <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner" />
-  </a>
-  <button id="overlay-close" title="Fechar">×</button>
-</div>
-<style>
-  #overlay-banner {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0,0,0,0.6);
-    padding: 8px;
-    border-radius: 10px;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-  }
-  #overlay-banner img {
-    max-width: 250px;
-    height: auto;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  #overlay-close {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background: #fff;
-    color: #000;
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 0 5px rgba(0,0,0,0.3);
-  }
-</style>
+      // Script seguro para overlay
+      const overlayScript = `
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const closeBtn = document.getElementById('overlay-close');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        const banner = document.getElementById('overlay-banner');
-        if (banner) banner.remove();
-      });
+document.addEventListener("DOMContentLoaded", function () {
+  const style = document.createElement("style");
+  style.textContent = \`
+    #overlay-banner {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.6);
+      padding: 8px;
+      border-radius: 10px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
-  });
-</script>
-</body>`;
+    #overlay-banner img {
+      max-width: 250px;
+      height: auto;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #overlay-close {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #fff;
+      color: #000;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+  \`;
+  document.head.appendChild(style);
 
-      // Injeta o overlay antes da tag </body>
+  const overlay = document.createElement("div");
+  overlay.id = "overlay-banner";
+  overlay.innerHTML = \`
+    <a href="https://8xbet86.com/" target="_blank">
+      <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner" />
+    </a>
+    <button id="overlay-close" title="Fechar">×</button>
+  \`;
+
+  overlay.querySelector('#overlay-close').addEventListener('click', () => {
+    overlay.remove();
+  });
+
+  document.body.appendChild(overlay);
+});
+</script>`;
+
+      // Injeta o script no final do body
       const finalHtml = data.includes('</body>')
-        ? data.replace('</body>', overlayCode)
-        : data + overlayCode;
+        ? data.replace('</body>', overlayScript + '</body>')
+        : data + overlayScript;
 
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
       res.statusCode = 200;
       res.end(finalHtml);
     });
-  }).on("error", (err) => {
-    console.error("Erro:", err.message);
+  }).on('error', (err) => {
+    console.error('Erro:', err.message);
     res.statusCode = 500;
-    res.end("Erro ao carregar conteúdo");
+    res.end('Erro ao carregar conteúdo');
   });
 };
