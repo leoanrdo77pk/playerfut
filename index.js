@@ -22,53 +22,66 @@ module.exports = async (req, res) => {
         .replace(/action="\/([^"]+)"/g, 'action="/$1"')
         .replace(/<base[^>]*>/gi, '');
 
-      // Injeção segura de banner no final do body com verificação
-      let finalHtml;
-      if (data.includes('</body>')) {
-        finalHtml = data.replace('</body>', `
-  <div id="custom-footer">
-    <a href="https://8xbet86.com/" target="_blank">
-      <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
-    </a>
-  </div>
-  <style>
-    #custom-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: transparent;
-      text-align: center;
-      z-index: 9999;
-    }
-    body { padding-bottom: 120px !important; }
-  </style>
-</body>`);
-      } else {
-        // Se não tiver </body>, adiciona manualmente
-        finalHtml = `
-${data}
-<div id="custom-footer">
+      // Overlay em cima do conteúdo
+      const overlayCode = `
+<div id="overlay-banner">
   <a href="https://8xbet86.com/" target="_blank">
-    <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
+    <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner" />
   </a>
+  <button id="overlay-close" title="Fechar">×</button>
 </div>
 <style>
-  #custom-footer {
+  #overlay-banner {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: transparent;
-    text-align: center;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.6);
+    padding: 8px;
+    border-radius: 10px;
     z-index: 9999;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
   }
-  body { padding-bottom: 120px !important; }
-</style>`;
-      }
+  #overlay-banner img {
+    max-width: 250px;
+    height: auto;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  #overlay-close {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #fff;
+    color: #000;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const closeBtn = document.getElementById('overlay-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        const banner = document.getElementById('overlay-banner');
+        if (banner) banner.remove();
+      });
+    }
+  });
+</script>
+</body>`;
 
+      // Injeta o overlay antes da tag </body>
+      const finalHtml = data.includes('</body>')
+        ? data.replace('</body>', overlayCode)
+        : data + overlayCode;
 
-      
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
       res.statusCode = 200;
