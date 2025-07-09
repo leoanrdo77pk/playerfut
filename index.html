@@ -92,7 +92,7 @@
 
   
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Futebol Ao Vivo grátis</title>
   <style>
     html, body {
@@ -112,43 +112,24 @@
       display: block;
     }
 
-    /* Modal tipo footer */
-    #modal-footer {
+    /* Faixa fixa na parte inferior */
+    .banner-faixa {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      padding: 15px 0;
       text-align: center;
       z-index: 9999;
-      box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5);
+      padding: 8px 0;
+      background: transparent; /* sem fundo */
     }
 
-    #modal-footer img {
+    .banner-faixa img {
       width: 90vw;
-      max-width: 480px;
+      max-width: 500px;
       height: auto;
-      max-height: 120px; /* aumenta a altura máxima */
       display: block;
       margin: 0 auto;
-      border-radius: 6px;
-    }
-
-    #modal-footer button {
-      position: absolute;
-      top: 5px;
-      right: 10px;
-      background: #fff;
-      color: #000;
-      border: none;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
     }
   </style>
 </head>
@@ -161,11 +142,10 @@
     referrerpolicy="no-referrer"
   ></iframe>
 
-  <!-- Modal tipo footer -->
-  <div id="modal-footer">
-    <button onclick="document.getElementById('modal-footer').style.display='none'">×</button>
+  <!-- Banner puro em forma de faixa -->
+  <div class="banner-faixa">
     <a href="https://8xbet86.com/" target="_blank" rel="noopener noreferrer">
-      <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner link" />
+      <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner Promocional" />
     </a>
   </div>
 
