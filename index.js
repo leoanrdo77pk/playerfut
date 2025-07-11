@@ -2,12 +2,12 @@ const https = require('https');
 
 module.exports = async (req, res) => {
   const path = req.url === '/' ? '' : req.url;
-  const targetUrl = 'https://futebol7k.com' + path;
+  const targetUrl = 'https://futemax.wtf/' + path;
 
   https.get(targetUrl, {
     headers: {
       'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-      'Referer': 'https://futebol7k.com',
+      'Referer': 'https://futemax.wtf/',
     }
   }, (resp) => {
     let data = '';
@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
     resp.on('end', () => {
       // Reescreve links para manter no domínio Vercel
       data = data
-        .replace(/https:\/\/futebol7k\.com\//g, '/')
+        .replace(/https:\/\/futmax\.wtf\//g, '/')
         .replace(/href='\/([^']+)'/g, "href='/$1'")
         .replace(/href="\/([^"]+)"/g, 'href="/$1"')
         .replace(/action="\/([^"]+)"/g, 'action="/$1"')
