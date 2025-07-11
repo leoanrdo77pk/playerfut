@@ -16,14 +16,13 @@ module.exports = async (req, res) => {
     resp.on('end', () => {
       // Reescreve links internos para que apontem para o seu domínio (Vercel)
       data = data
-        .replace(/https:\/\/futemax\.wtf\//g, '/')
-        .replace(/href='\/([^']+)'/g, "href='/$1'")
-        .replace(/href="\/([^"]+)"/g, 'href="/$1"')
-        .replace(/action="\/([^"]+)"/g, 'action="/$1"')
-        .replace(/src="\/([^"]+)"/g, 'src="/$1"')  // Reescreve as imagens e scripts
+        .replace(/https:\/\/futemax\.wtf\//g, '/')   // Substitui o domínio original para o caminho relativo
+        .replace(/href='\/([^']+)'/g, "href='/$1'") // Substitui os links href internos
+        .replace(/href="\/([^"]+)"/g, 'href="/$1"')  // Substitui os links href internos
+        .replace(/action="\/([^"]+)"/g, 'action="/$1"') // Substitui os links action internos
+        .replace(/src="\/([^"]+)"/g, 'src="/$1"')  // Corrige o src de imagens e scripts
+        .replace(/src='\/([^']+)'/g, "src='/$1'")  // Corrige o src de imagens e scripts
         .replace(/<base[^>]*>/gi, '')  // Remove a tag <base> que pode interferir na navegação
-        .replace(/src='\/([^']+)'/g, "src='/$1'")
-        .replace(/src="\/([^"]+)"/g, 'src="/$1"');
 
       // Adiciona o banner no final do body, se o </body> existir
       let finalHtml;
