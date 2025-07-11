@@ -1,7 +1,7 @@
 const https = require('https');
 
 module.exports = async (req, res) => {
-  const path = req.url === '/' ? '' : req.url; // Configura a URL de destino
+  const path = req.url === '/' ? '' : req.url;
   const targetUrl = 'https://futemax.wtf/' + path;
 
   https.get(targetUrl, {
@@ -14,13 +14,16 @@ module.exports = async (req, res) => {
 
     resp.on('data', chunk => data += chunk);
     resp.on('end', () => {
-      // Reescreve links para manter no domínio Vercel
+      // Reescreve links internos para que apontem para o seu domínio (Vercel)
       data = data
         .replace(/https:\/\/futemax\.wtf\//g, '/')
         .replace(/href='\/([^']+)'/g, "href='/$1'")
         .replace(/href="\/([^"]+)"/g, 'href="/$1"')
         .replace(/action="\/([^"]+)"/g, 'action="/$1"')
-        .replace(/<base[^>]*>/gi, ''); // Remove tags base para não afetar a navegação
+        .replace(/src="\/([^"]+)"/g, 'src="/$1"')  // Reescreve as imagens e scripts
+        .replace(/<base[^>]*>/gi, '')  // Remove a tag <base> que pode interferir na navegação
+        .replace(/src='\/([^']+)'/g, "src='/$1'")
+        .replace(/src="\/([^"]+)"/g, 'src="/$1"');
 
       // Adiciona o banner no final do body, se o </body> existir
       let finalHtml;
@@ -45,7 +48,7 @@ module.exports = async (req, res) => {
   </style>
 </body>`);
       } else {
-        // Se não encontrar </body>, adiciona no final
+        // Se não encontrar </body>, adiciona no final manualmente
         finalHtml = `
 ${data}
 <div id="custom-footer">
