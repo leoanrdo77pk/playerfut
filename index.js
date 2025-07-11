@@ -20,15 +20,59 @@ module.exports = async (req, res) => {
         .replace(/href='\/([^']+)'/g, "href='/$1'")
         .replace(/href="\/([^"]+)"/g, 'href="/$1"')
         .replace(/action="\/([^"]+)"/g, 'action="/$1"')
-        .replace(/src="\/([^"]+)"/g, 'src="/$1"')  // Reescreve as imagens e scripts
-        .replace(/src='\/([^']+)'/g, "src='/$1'")  // Reescreve as imagens e scripts
-        .replace(/<base[^>]*>/gi, '')  // Remove a tag <base> que pode interferir na navegação
+        .replace(/<base[^>]*>/gi, '');
 
-      // Apenas retorna o conteúdo sem banner
+      // Injeção segura de banner no final do body com verificação
+      let finalHtml;
+      if (data.includes('</body>')) {
+        finalHtml = data.replace('</body>', `
+  <div id="custom-footer">
+    <a href="https://8xbet86.com/" target="_blank">
+      <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
+    </a>
+  </div>
+  <style>
+    #custom-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: transparent;
+      text-align: center;
+      z-index: 9999;
+    }
+    body { padding-bottom: 120px !important; }
+  </style>
+</body>`);
+      } else {
+        // Se não tiver </body>, adiciona manualmente
+        finalHtml = `
+${data}
+<div id="custom-footer">
+  <a href="https://8xbet86.com/" target="_blank">
+    <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
+  </a>
+</div>
+<style>
+  #custom-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: transparent;
+    text-align: center;
+    z-index: 9999;
+  }
+  body { padding-bottom: 120px !important; }
+</style>`;
+      }
+
+
+      
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
       res.statusCode = 200;
-      res.end(data);  // Retorna o conteúdo sem o banner
+      res.end(finalHtml);
     });
   }).on("error", (err) => {
     console.error("Erro:", err.message);
