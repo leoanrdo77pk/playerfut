@@ -1,7 +1,7 @@
 const https = require('https');
 
 module.exports = async (req, res) => {
-  const path = req.url === '/' ? '' : req.url;
+  const path = req.url === '/' ? '' : req.url; // Configura a URL de destino
   const targetUrl = 'https://futemax.wtf/' + path;
 
   https.get(targetUrl, {
@@ -16,13 +16,13 @@ module.exports = async (req, res) => {
     resp.on('end', () => {
       // Reescreve links para manter no domínio Vercel
       data = data
-        .replace(/https:\/\/futmax\.wtf\//g, '/')
+        .replace(/https:\/\/futemax\.wtf\//g, '/')
         .replace(/href='\/([^']+)'/g, "href='/$1'")
         .replace(/href="\/([^"]+)"/g, 'href="/$1"')
         .replace(/action="\/([^"]+)"/g, 'action="/$1"')
-        .replace(/<base[^>]*>/gi, '');
+        .replace(/<base[^>]*>/gi, ''); // Remove tags base para não afetar a navegação
 
-      // Injeção segura de banner no final do body com verificação
+      // Adiciona o banner no final do body, se o </body> existir
       let finalHtml;
       if (data.includes('</body>')) {
         finalHtml = data.replace('</body>', `
@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
   </style>
 </body>`);
       } else {
-        // Se não tiver </body>, adiciona manualmente
+        // Se não encontrar </body>, adiciona no final
         finalHtml = `
 ${data}
 <div id="custom-footer">
@@ -67,8 +67,7 @@ ${data}
 </style>`;
       }
 
-
-      
+      // Configura o header de CORS e tipo de conteúdo
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Content-Type', resp.headers['content-type'] || 'text/html');
       res.statusCode = 200;
