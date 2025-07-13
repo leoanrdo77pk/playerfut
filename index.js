@@ -1,5 +1,5 @@
 const https = require('https');
-<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />
+
 module.exports = async (req, res) => {
   try {
     const path = req.url === '/' ? '' : req.url;
