@@ -28,6 +28,9 @@ module.exports = async (req, res) => {
           data = data
             .replace(/<title>[^<]*<\/title>/, '<title>Meu Site</title>')  // Coloque aqui o título desejado
             .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');  // Remove o ícone
+            .replace(/<head[^>]*>/i, match => `${match}
+  <meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`);
+
 
           // Injeção segura de banner no final do body com verificação
           let finalHtml;
