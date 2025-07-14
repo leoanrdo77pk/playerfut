@@ -27,7 +27,8 @@ module.exports = async (req, res) => {
           // Remover ou alterar o título e o ícone
           data = data
             .replace(/<title>[^<]*<\/title>/, '<title>Meu Site</title>')  // Coloque aqui o título desejado
-            .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');  // Remove o ícone
+            document.head.innerHTML += '<link rel="icon" href="https://link-para-sua-imagem.ico" />';
+
             
 
 
