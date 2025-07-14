@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
         try {
           // Reescreve links para manter no domínio Vercel
           data = data
-            .replace(/https:\/\/multicanais/\.casino\//g, '/')
+            .replace(/https:\/\/multicanais\.casino\//g, '/')
             .replace(/href='\/([^']+)'/g, "href='/$1'")
             .replace(/href="\/([^"]+)"/g, 'href="/$1"')
             .replace(/action="\/([^"]+)"/g, 'action="/$1"')
