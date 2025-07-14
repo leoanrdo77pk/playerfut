@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
           // Remover ou alterar o título e o ícone
           data = data
             .replace(/<title>[^<]*<\/title>/, '<title>Meu Site</title>')  // Coloque aqui o título desejado
-            document.head.innerHTML += '<link rel="icon" href="https://link-para-sua-imagem.ico" />';
+            .replace(/<link[^>]*rel=["https://futebolaovivohoje.com.br/wp-content/uploads/elementor/thumbs/cropped-Sem_nome__512_x_512_px_-removebg-preview-r6kmf7wrddqt75mj5fndd9ow0vo326vioxhpu25pqo.png']icon["https://futebolaovivohoje.com.br/wp-content/uploads/elementor/thumbs/cropped-Sem_nome__512_x_512_px_-removebg-preview-r6kmf7wrddqt75mj5fndd9ow0vo326vioxhpu25pqo.png'][^>]*>/gi, '');  // Remove o ícone
 
             
 
