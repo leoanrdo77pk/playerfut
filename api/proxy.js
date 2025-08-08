@@ -7,11 +7,34 @@ const DOMINIOS = [
   'embedtv-3.icu'
 ];
 
+// Função auxiliar para proxy de arquivos binários
+function proxyStream(url, req, res) {
+  https.get(url, {
+    headers: {
+      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+      'Referer': 'https://' + DOMINIOS[0] + '/',
+    }
+  }, (streamResp) => {
+    res.writeHead(streamResp.statusCode, streamResp.headers);
+    streamResp.pipe(res);
+  }).on('error', (err) => {
+    console.error('Erro no stream:', err);
+    res.statusCode = 500;
+    res.end('Erro ao carregar stream.');
+  });
+}
+
 module.exports = async (req, res) => {
   try {
     const path = req.url === '/' ? '' : req.url;
     const targetUrl = 'https://' + DOMINIOS[0] + path;
 
+    // Detectar se é arquivo de vídeo/stream ou binário
+    if (/\.(m3u8|ts|mp4|webm|ogg|jpg|jpeg|png|gif|css|js)$/i.test(path)) {
+      return proxyStream(targetUrl, req, res);
+    }
+
+    // HTML ou texto — aplicar substituições
     https.get(targetUrl, {
       headers: {
         'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
@@ -27,12 +50,11 @@ module.exports = async (req, res) => {
           delete headers['x-frame-options'];
           delete headers['content-security-policy'];
 
-          // Criar regex para substituir qualquer domínio da lista
+          // Substituir qualquer domínio embedtv
           const dominioRegex = new RegExp(`https?:\/\/(?:${DOMINIOS.join('|')})\/`, 'g');
 
           data = data
             .replace(dominioRegex, '/')
-            // Também no src/href/action/url()
             .replace(/src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'src="/$1"')
             .replace(/href=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'href="/$1"')
             .replace(/action=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'action="/$1"')
@@ -40,7 +62,7 @@ module.exports = async (req, res) => {
             .replace(/<iframe([^>]*)src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, '<iframe$1src="/$2"')
             .replace(/<base[^>]*>/gi, '');
 
-          // Ajustar links relativos
+          // Links relativos
           data = data
             .replace(/href='\/([^']+)'/g, "href='/$1'")
             .replace(/href="\/([^"]+)"/g, 'href="/$1"')
@@ -51,7 +73,7 @@ module.exports = async (req, res) => {
             .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
             .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
 
-          // Injetar banner no final
+          // Injetar banner
           let finalHtml;
           if (data.includes('</body>')) {
             finalHtml = data.replace('</body>', `
