@@ -1,124 +1,123 @@
 const https = require('https');
-const { URL } = require('url');
 
-// Lista de domínios conhecidos
 const DOMINIOS = [
   'embedtv.digital',
   'embedtv-1.icu',
   'embedtv-2.icu',
-  'embedtv-3.icu'
+  'embedtv-3.icu',
 ];
 
-// Função auxiliar para stream de arquivos binários
-function proxyStream(url, req, res) {
-  https.get(url, {
-    headers: {
-      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-      'Referer': 'https://' + new URL(url).hostname + '/',
-    }
-  }, (streamResp) => {
-    res.writeHead(streamResp.statusCode, streamResp.headers);
-    streamResp.pipe(res);
-  }).on('error', (err) => {
-    console.error('Erro no stream:', err);
-    res.statusCode = 500;
-    res.end('Erro ao carregar stream.');
+function fetchUrl(url, reqHeaders) {
+  return new Promise((resolve, reject) => {
+    https.get(url, { headers: reqHeaders }, (res) => {
+      if (res.statusCode === 200) {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => resolve({ res, data }));
+      } else {
+        // Não é 200, rejeita para tentar próximo domínio
+        res.resume(); // descarta dados
+        reject(new Error('Status ' + res.statusCode));
+      }
+    }).on('error', reject);
   });
 }
 
 module.exports = async (req, res) => {
   try {
-    let path = req.url;
+    let path = req.url === '/' ? '' : req.url;
 
-    // Determina qual domínio usar — se tiver ?src=dominio no link, respeita
-    let dominioBase = DOMINIOS[0];
-    const dominioParam = req.query?.src || null;
-    if (dominioParam && DOMINIOS.includes(dominioParam)) {
-      dominioBase = dominioParam;
+    const reqHeaders = {
+      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+      'Referer': `https://${DOMINIOS[0]}/`,
+    };
+
+    let fetched = null;
+    let dominioUsado = null;
+
+    // Tenta todos os domínios até achar o conteúdo
+    for (const dominio of DOMINIOS) {
+      try {
+        const url = `https://${dominio}${path}`;
+        fetched = await fetchUrl(url, reqHeaders);
+        dominioUsado = dominio;
+        break; // achou, sai do loop
+      } catch (_) {
+        // continua tentando próximo domínio
+      }
     }
 
-    // Monta URL final
-    const targetUrl = `https://${dominioBase}${path}`;
+    if (!fetched) {
+      res.statusCode = 404;
+      return res.end('Conteúdo não encontrado em nenhum domínio.');
+    }
 
-    // Se for .m3u8 — buscar, reescrever e servir
+    const { res: respOrig, data } = fetched;
+
+    // Se for m3u8, reescreve os caminhos dos .ts para passarem pelo proxy
     if (/\.m3u8$/i.test(path)) {
-      https.get(targetUrl, {
-        headers: {
-          'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-          'Referer': `https://${dominioBase}/`,
+      let playlist = data.replace(/(.*\.ts)/g, (match) => {
+        if (match.startsWith('http')) {
+          // troca domínio para relativo ao proxy
+          return match.replace(new RegExp(`https?:\/\/${dominioUsado}\/`), '/');
         }
-      }, (resp) => {
-        let playlist = '';
-        resp.on('data', chunk => playlist += chunk);
-        resp.on('end', () => {
-          // Reescreve caminhos .ts para passarem pelo proxy
-          playlist = playlist.replace(/(.*\.ts)/g, (match) => {
-            if (match.startsWith('http')) return match.replace(new RegExp(`https?:\/\/${dominioBase}\/`), '/');
-            return `/${match}`;
-          });
+        return `/${match}`;
+      });
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.apple.mpegurl',
+        'Access-Control-Allow-Origin': '*'
+      });
+      return res.end(playlist);
+    }
 
-          res.writeHead(200, {
-            'Content-Type': 'application/vnd.apple.mpegurl',
-            'Access-Control-Allow-Origin': '*'
-          });
-          res.end(playlist);
-        });
+    // Se for arquivo estático (ts, mp4, imagens, css, js), faz proxy direto (stream)
+    if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|css|js)$/i.test(path)) {
+      https.get(`https://${dominioUsado}${path}`, { headers: reqHeaders }, (streamResp) => {
+        res.writeHead(streamResp.statusCode, streamResp.headers);
+        streamResp.pipe(res);
       }).on('error', (err) => {
-        console.error("Erro ao buscar m3u8:", err);
+        console.error('Erro proxy stream:', err);
         res.statusCode = 500;
-        res.end("Erro ao carregar playlist.");
+        res.end('Erro no proxy de arquivo.');
       });
       return;
     }
 
-    // Se for .ts ou outros binários
-    if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|css|js)$/i.test(path)) {
-      return proxyStream(targetUrl, req, res);
-    }
+    // Se for HTML, reescreve links para manter no seu domínio
+    if (respOrig.headers['content-type'] && respOrig.headers['content-type'].includes('text/html')) {
+      let html = data;
 
-    // Caso HTML ou texto
-    https.get(targetUrl, {
-      headers: {
-        'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-        'Referer': `https://${dominioBase}/`,
-      }
-    }, (resp) => {
-      let data = '';
-      resp.on('data', chunk => data += chunk);
-      resp.on('end', () => {
-        try {
-          const headers = { ...resp.headers };
-          delete headers['x-frame-options'];
-          delete headers['content-security-policy'];
+      // Remove headers que bloqueiam iframe, CSP, etc.
+      const headers = { ...respOrig.headers };
+      delete headers['x-frame-options'];
+      delete headers['content-security-policy'];
 
-          // Substituir todos os domínios conhecidos pelo caminho local
-          const dominioRegex = new RegExp(`https?:\/\/(?:${DOMINIOS.join('|')})\/`, 'g');
-          data = data.replace(dominioRegex, '/');
+      // Reescreve os links dos domínios para relativos
+      const dominioRegex = new RegExp(`https?:\/\/(?:${DOMINIOS.join('|')})\/`, 'g');
+      html = html.replace(dominioRegex, '/');
 
-          // Reescrever src/href/action/url/iframe
-          data = data
-            .replace(/src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'src="/$1"')
-            .replace(/href=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'href="/$1"')
-            .replace(/action=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'action="/$1"')
-            .replace(/url\(["']?https?:\/\/(?:embedtv[^\/]+)\/(.*?)["']?\)/g, 'url("/$1")')
-            .replace(/<iframe([^>]*)src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, '<iframe$1src="/$2"')
-            .replace(/<base[^>]*>/gi, '');
+      html = html
+        .replace(/src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'src="/$1"')
+        .replace(/href=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'href="/$1"')
+        .replace(/action=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'action="/$1"')
+        .replace(/url\(["']?https?:\/\/(?:embedtv[^\/]+)\/(.*?)["']?\)/g, 'url("/$1")')
+        .replace(/<iframe([^>]*)src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, '<iframe$1src="/$2"')
+        .replace(/<base[^>]*>/gi, '');
 
-          // Ajusta links relativos
-          data = data
-            .replace(/href='\/([^']+)'/g, "href='/$1'")
-            .replace(/href="\/([^"]+)"/g, 'href="/$1"')
-            .replace(/action="\/([^"]+)"/g, 'action="/$1"');
+      // Ajustes de links relativos
+      html = html
+        .replace(/href='\/([^']+)'/g, "href='/$1'")
+        .replace(/href="\/([^"]+)"/g, 'href="/$1"')
+        .replace(/action="\/([^"]+)"/g, 'action="/$1"');
 
-          // Trocar título e remover ícone
-          data = data
-            .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
-            .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
+      // Trocar título e remover ícone
+      html = html
+        .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
+        .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
 
-          // Injetar banner no final
-          let finalHtml;
-          if (data.includes('</body>')) {
-            finalHtml = data.replace('</body>', `
+      // Injetar banner no fim
+      if (html.includes('</body>')) {
+        html = html.replace('</body>', `
 <div id="custom-footer">
   <a href="https://8xbet86.com/" target="_blank">
     <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
@@ -127,9 +126,7 @@ module.exports = async (req, res) => {
 <style>
   #custom-footer {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    bottom: 0; left: 0; width: 100%;
     background: transparent;
     text-align: center;
     z-index: 9999;
@@ -137,8 +134,8 @@ module.exports = async (req, res) => {
   body { padding-bottom: 120px !important; }
 </style>
 </body>`);
-          } else {
-            finalHtml = data + `
+      } else {
+        html += `
 <div id="custom-footer">
   <a href="https://8xbet86.com/" target="_blank">
     <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
@@ -147,38 +144,30 @@ module.exports = async (req, res) => {
 <style>
   #custom-footer {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    bottom: 0; left: 0; width: 100%;
     background: transparent;
     text-align: center;
     z-index: 9999;
   }
   body { padding-bottom: 120px !important; }
 </style>`;
-          }
+      }
 
-          res.writeHead(200, {
-            ...headers,
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': resp.headers['content-type'] || 'text/html'
-          });
-          res.end(finalHtml);
-        } catch (err) {
-          console.error("Erro ao processar HTML:", err);
-          res.statusCode = 500;
-          res.end("Erro ao processar o conteúdo.");
-        }
+      res.writeHead(200, {
+        ...headers,
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': respOrig.headers['content-type'] || 'text/html'
       });
-    }).on('error', (err) => {
-      console.error("Erro ao buscar HTML:", err);
-      res.statusCode = 500;
-      res.end("Erro ao carregar conteúdo.");
-    });
+      return res.end(html);
+    }
+
+    // Para outros tipos, só repassa puro
+    res.writeHead(respOrig.statusCode, respOrig.headers);
+    res.end(data);
 
   } catch (err) {
-    console.error("Erro geral:", err);
+    console.error('Erro geral proxy:', err);
     res.statusCode = 500;
-    res.end("Erro interno.");
+    res.end('Erro interno.');
   }
 };
