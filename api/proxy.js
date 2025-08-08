@@ -1,5 +1,7 @@
 const https = require('https');
+const { URL } = require('url');
 
+// Lista de domínios conhecidos
 const DOMINIOS = [
   'embedtv.digital',
   'embedtv-1.icu',
@@ -7,12 +9,12 @@ const DOMINIOS = [
   'embedtv-3.icu'
 ];
 
-// Função auxiliar para proxy de arquivos binários
+// Função auxiliar para stream de arquivos binários
 function proxyStream(url, req, res) {
   https.get(url, {
     headers: {
       'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-      'Referer': 'https://' + DOMINIOS[0] + '/',
+      'Referer': 'https://' + new URL(url).hostname + '/',
     }
   }, (streamResp) => {
     res.writeHead(streamResp.statusCode, streamResp.headers);
@@ -26,23 +28,62 @@ function proxyStream(url, req, res) {
 
 module.exports = async (req, res) => {
   try {
-    const path = req.url === '/' ? '' : req.url;
-    const targetUrl = 'https://' + DOMINIOS[0] + path;
+    let path = req.url;
 
-    // Detectar se é arquivo de vídeo/stream ou binário
-    if (/\.(m3u8|ts|mp4|webm|ogg|jpg|jpeg|png|gif|css|js)$/i.test(path)) {
+    // Determina qual domínio usar — se tiver ?src=dominio no link, respeita
+    let dominioBase = DOMINIOS[0];
+    const dominioParam = req.query?.src || null;
+    if (dominioParam && DOMINIOS.includes(dominioParam)) {
+      dominioBase = dominioParam;
+    }
+
+    // Monta URL final
+    const targetUrl = `https://${dominioBase}${path}`;
+
+    // Se for .m3u8 — buscar, reescrever e servir
+    if (/\.m3u8$/i.test(path)) {
+      https.get(targetUrl, {
+        headers: {
+          'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+          'Referer': `https://${dominioBase}/`,
+        }
+      }, (resp) => {
+        let playlist = '';
+        resp.on('data', chunk => playlist += chunk);
+        resp.on('end', () => {
+          // Reescreve caminhos .ts para passarem pelo proxy
+          playlist = playlist.replace(/(.*\.ts)/g, (match) => {
+            if (match.startsWith('http')) return match.replace(new RegExp(`https?:\/\/${dominioBase}\/`), '/');
+            return `/${match}`;
+          });
+
+          res.writeHead(200, {
+            'Content-Type': 'application/vnd.apple.mpegurl',
+            'Access-Control-Allow-Origin': '*'
+          });
+          res.end(playlist);
+        });
+      }).on('error', (err) => {
+        console.error("Erro ao buscar m3u8:", err);
+        res.statusCode = 500;
+        res.end("Erro ao carregar playlist.");
+      });
+      return;
+    }
+
+    // Se for .ts ou outros binários
+    if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|css|js)$/i.test(path)) {
       return proxyStream(targetUrl, req, res);
     }
 
-    // HTML ou texto — aplicar substituições
+    // Caso HTML ou texto
     https.get(targetUrl, {
       headers: {
         'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-        'Referer': 'https://' + DOMINIOS[0] + '/',
+        'Referer': `https://${dominioBase}/`,
       }
     }, (resp) => {
       let data = '';
-
       resp.on('data', chunk => data += chunk);
       resp.on('end', () => {
         try {
@@ -50,11 +91,12 @@ module.exports = async (req, res) => {
           delete headers['x-frame-options'];
           delete headers['content-security-policy'];
 
-          // Substituir qualquer domínio embedtv
+          // Substituir todos os domínios conhecidos pelo caminho local
           const dominioRegex = new RegExp(`https?:\/\/(?:${DOMINIOS.join('|')})\/`, 'g');
+          data = data.replace(dominioRegex, '/');
 
+          // Reescrever src/href/action/url/iframe
           data = data
-            .replace(dominioRegex, '/')
             .replace(/src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'src="/$1"')
             .replace(/href=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'href="/$1"')
             .replace(/action=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'action="/$1"')
@@ -62,18 +104,18 @@ module.exports = async (req, res) => {
             .replace(/<iframe([^>]*)src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, '<iframe$1src="/$2"')
             .replace(/<base[^>]*>/gi, '');
 
-          // Links relativos
+          // Ajusta links relativos
           data = data
             .replace(/href='\/([^']+)'/g, "href='/$1'")
             .replace(/href="\/([^"]+)"/g, 'href="/$1"')
             .replace(/action="\/([^"]+)"/g, 'action="/$1"');
 
-          // Alterar título e remover ícone
+          // Trocar título e remover ícone
           data = data
             .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
             .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
 
-          // Injetar banner
+          // Injetar banner no final
           let finalHtml;
           if (data.includes('</body>')) {
             finalHtml = data.replace('</body>', `
@@ -121,7 +163,6 @@ module.exports = async (req, res) => {
             'Access-Control-Allow-Origin': '*',
             'Content-Type': resp.headers['content-type'] || 'text/html'
           });
-
           res.end(finalHtml);
         } catch (err) {
           console.error("Erro ao processar HTML:", err);
@@ -129,8 +170,8 @@ module.exports = async (req, res) => {
           res.end("Erro ao processar o conteúdo.");
         }
       });
-    }).on("error", (err) => {
-      console.error("Erro ao buscar conteúdo:", err);
+    }).on('error', (err) => {
+      console.error("Erro ao buscar HTML:", err);
       res.statusCode = 500;
       res.end("Erro ao carregar conteúdo.");
     });
