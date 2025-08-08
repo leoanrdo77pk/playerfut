@@ -3,12 +3,12 @@ const https = require('https');
 module.exports = async (req, res) => {
   try {
     const path = req.url === '/' ? '' : req.url;
-    const targetUrl = 'https://futebol7k.com/' + path;
+    const targetUrl = 'https://futemax.gratis/' + path;
 
     https.get(targetUrl, {
       headers: {
         'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-        'Referer': 'https://futebol7k.com/',
+        'Referer': 'https://futemax.gratis/',
       }
     }, (resp) => {
       let data = '';
