@@ -1,14 +1,21 @@
 const https = require('https');
 
+const DOMINIOS = [
+  'embedtv.digital',
+  'embedtv-1.icu',
+  'embedtv-2.icu',
+  'embedtv-3.icu'
+];
+
 module.exports = async (req, res) => {
   try {
     const path = req.url === '/' ? '' : req.url;
-    const targetUrl = 'https://embedtv.digital' + path;
+    const targetUrl = 'https://' + DOMINIOS[0] + path;
 
     https.get(targetUrl, {
       headers: {
         'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-        'Referer': 'https://embedtv.digital/',
+        'Referer': 'https://' + DOMINIOS[0] + '/',
       }
     }, (resp) => {
       let data = '';
@@ -16,21 +23,21 @@ module.exports = async (req, res) => {
       resp.on('data', chunk => data += chunk);
       resp.on('end', () => {
         try {
-          // Remove cabeçalhos que bloqueiam exibição
           const headers = { ...resp.headers };
           delete headers['x-frame-options'];
           delete headers['content-security-policy'];
 
-          // Reescrever todas as URLs absolutas e relativas para seu domínio
+          // Criar regex para substituir qualquer domínio da lista
+          const dominioRegex = new RegExp(`https?:\/\/(?:${DOMINIOS.join('|')})\/`, 'g');
+
           data = data
-            .replace(/https:\/\/embedtv\.digital\//g, '/')
-            .replace(/src="https:\/\/embedtv\.digital\/([^"]+)"/g, 'src="/$1"')
-            .replace(/src='https:\/\/embedtv\.digital\/([^']+)'/g, "src='/$1'")
-            .replace(/href="https:\/\/embedtv\.digital\/([^"]+)"/g, 'href="/$1"')
-            .replace(/href='https:\/\/embedtv\.digital\/([^']+)'/g, "href='/$1'")
-            .replace(/action="https:\/\/embedtv\.digital\/([^"]+)"/g, 'action="/$1"')
-            .replace(/url\(["']?https:\/\/embedtv\.digital\/(.*?)["']?\)/g, 'url("/$1")')
-            .replace(/<iframe([^>]*)src=["']https:\/\/embedtv\.digital\/([^"']+)["']/g, '<iframe$1src="/$2"')
+            .replace(dominioRegex, '/')
+            // Também no src/href/action/url()
+            .replace(/src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'src="/$1"')
+            .replace(/href=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'href="/$1"')
+            .replace(/action=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'action="/$1"')
+            .replace(/url\(["']?https?:\/\/(?:embedtv[^\/]+)\/(.*?)["']?\)/g, 'url("/$1")')
+            .replace(/<iframe([^>]*)src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, '<iframe$1src="/$2"')
             .replace(/<base[^>]*>/gi, '');
 
           // Ajustar links relativos
@@ -67,8 +74,7 @@ module.exports = async (req, res) => {
 </style>
 </body>`);
           } else {
-            finalHtml = `
-${data}
+            finalHtml = data + `
 <div id="custom-footer">
   <a href="https://8xbet86.com/" target="_blank">
     <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
