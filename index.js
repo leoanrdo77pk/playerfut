@@ -49,8 +49,8 @@ module.exports = async (req, res) => {
           if (data.includes('</body>')) {
             finalHtml = data.replace('</body>', `
 <div id="custom-footer">
-  <a href="https://8xbet86.com/" target="_blank">
-    <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
+  <a href="https://s.shopee.com.br/4VSYYPCHx2/" target="_blank">
+    <img src="https://i.ibb.co/XfhTxV5g/Design-sem-nome-1.png" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
   </a>
 </div>
 <style>
@@ -70,8 +70,8 @@ module.exports = async (req, res) => {
             finalHtml = `
 ${data}
 <div id="custom-footer">
-  <a href="https://8xbet86.com/" target="_blank">
-    <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
+  <a href="https://s.shopee.com.br/4VSYYPCHx2/" target="_blank">
+    <img src="https://i.ibb.co/XfhTxV5g/Design-sem-nome-1.png" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
   </a>
 </div>
 <style>
