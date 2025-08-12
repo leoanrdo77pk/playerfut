@@ -119,8 +119,8 @@ module.exports = async (req, res) => {
       if (html.includes('</body>')) {
         html = html.replace('</body>', `
 <div id="custom-footer">
-  <a href="" target="_blank">
-    <img src="https://i.ibb.co/XFmnzY7/Captura-de-tela-2024-11-11-112206.png" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
+  <a href="https://s.shopee.com.br/4VSYYPCHx2" target="_blank">
+    <img src="https://i.ibb.co/XfhTxV5g/Design-sem-nome-1.png" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
   </a>
 </div>
 <style>
@@ -137,8 +137,8 @@ module.exports = async (req, res) => {
       } else {
         html += `
 <div id="custom-footer">
-  <a href="" target="_blank">
-    <img src="https://i.ibb.co/XFmnzY7/Captura-de-tela-2024-11-11-112206.png" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
+  <a href="https://s.shopee.com.br/4VSYYPCHx2" target="_blank">
+    <img src="https://i.ibb.co/XfhTxV5g/Design-sem-nome-1.png" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
   </a>
 </div>
 <style>
