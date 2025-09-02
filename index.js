@@ -1,4 +1,4 @@
-const https = require('https');
+coloque aqui pra mim  no meu codigo completo para eu copiar e colar  const https = require('https');
 
 const DOMINIOS = [
   'embedtv.digital',
@@ -15,6 +15,7 @@ function fetchUrl(url, reqHeaders) {
         res.on('data', chunk => data += chunk);
         res.on('end', () => resolve({ res, data }));
       } else {
+        // Não é 200, rejeita para tentar próximo domínio
         res.resume(); // descarta dados
         reject(new Error('Status ' + res.statusCode));
       }
@@ -34,13 +35,16 @@ module.exports = async (req, res) => {
     let fetched = null;
     let dominioUsado = null;
 
+    // Tenta todos os domínios até achar o conteúdo
     for (const dominio of DOMINIOS) {
       try {
         const url = `https://${dominio}${path}`;
         fetched = await fetchUrl(url, reqHeaders);
         dominioUsado = dominio;
-        break;
-      } catch (_) {}
+        break; // achou, sai do loop
+      } catch (_) {
+        // continua tentando próximo domínio
+      }
     }
 
     if (!fetched) {
@@ -50,10 +54,11 @@ module.exports = async (req, res) => {
 
     const { res: respOrig, data } = fetched;
 
-    // Se for m3u8
+    // Se for m3u8, reescreve os caminhos dos .ts para passarem pelo proxy
     if (/\.m3u8$/i.test(path)) {
       let playlist = data.replace(/(.*\.ts)/g, (match) => {
         if (match.startsWith('http')) {
+          // troca domínio para relativo ao proxy
           return match.replace(new RegExp(`https?:\/\/${dominioUsado}\/`), '/');
         }
         return `/${match}`;
@@ -65,7 +70,7 @@ module.exports = async (req, res) => {
       return res.end(playlist);
     }
 
-    // Se for arquivo estático
+    // Se for arquivo estático (ts, mp4, imagens, css, js), faz proxy direto (stream)
     if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|css|js)$/i.test(path)) {
       https.get(`https://${dominioUsado}${path}`, { headers: reqHeaders }, (streamResp) => {
         res.writeHead(streamResp.statusCode, streamResp.headers);
@@ -78,14 +83,16 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // Se for HTML
+    // Se for HTML, reescreve links para manter no seu domínio
     if (respOrig.headers['content-type'] && respOrig.headers['content-type'].includes('text/html')) {
       let html = data;
 
+      // Remove headers que bloqueiam iframe, CSP, etc.
       const headers = { ...respOrig.headers };
       delete headers['x-frame-options'];
       delete headers['content-security-policy'];
 
+      // Reescreve os links dos domínios para relativos
       const dominioRegex = new RegExp(`https?:\/\/(?:${DOMINIOS.join('|')})\/`, 'g');
       html = html.replace(dominioRegex, '/');
 
@@ -97,30 +104,23 @@ module.exports = async (req, res) => {
         .replace(/<iframe([^>]*)src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, '<iframe$1src="/$2"')
         .replace(/<base[^>]*>/gi, '');
 
+      // Ajustes de links relativos
       html = html
         .replace(/href='\/([^']+)'/g, "href='/$1'")
         .replace(/href="\/([^"]+)"/g, 'href="/$1"')
         .replace(/action="\/([^"]+)"/g, 'action="/$1"');
 
+      // Trocar título e remover ícone
       html = html
         .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
         .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
 
-      // 🔹 Injetar verificação no <head>
-      if (html.includes('</head>')) {
-        html = html.replace('</head>', `
-<!-- Bidvertiser2101686 -->
-<meta name="bidvertiser-site-verification" content="SEU_CODIGO_AQUI" />
-</head>`);
-      }
-
-      // 🔹 Injetar script + banner no final do <body>
+      // Injetar banner no fim
       if (html.includes('</body>')) {
         html = html.replace('</body>', `
-<!-- Bidvertiser2101686 -->
-<script type="text/javascript" src="//cdn.bidvertiser.com/BidVertiser.ScriptInclude.js?pid=2101686"></script>
-
+      
 <div id="custom-footer">
+
   <a href="https://8xbet86.com/" target="_blank">
     <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
   </a>
@@ -138,14 +138,12 @@ module.exports = async (req, res) => {
 </body>`);
       } else {
         html += `
-<!-- Bidvertiser2101686 -->
-<script type="text/javascript" src="//cdn.bidvertiser.com/BidVertiser.ScriptInclude.js?pid=2101686"></script>
-
 <div id="custom-footer">
   <a href="https://8xbet86.com/" target="_blank">
     <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
   </a>
 </div>
+
 <style>
   #custom-footer {
     position: fixed;
@@ -166,6 +164,7 @@ module.exports = async (req, res) => {
       return res.end(html);
     }
 
+    // Para outros tipos, só repassa puro
     res.writeHead(respOrig.statusCode, respOrig.headers);
     res.end(data);
 
