@@ -119,6 +119,7 @@ module.exports = async (req, res) => {
       if (html.includes('</body>')) {
         html = html.replace('</body>', `
 <div id="custom-footer">
+<!-- Bidvertiser2101686 -->
   <a href="https://8xbet86.com/" target="_blank">
     <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
   </a>
