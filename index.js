@@ -142,6 +142,7 @@ module.exports = async (req, res) => {
     <img src="https://i.imgur.com/Fen20UR.gif" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
   </a>
 </div>
+<!-- Bidvertiser2101686 -->
 <style>
   #custom-footer {
     position: fixed;
