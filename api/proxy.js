@@ -120,39 +120,8 @@ module.exports = async (req, res) => {
         html = html.replace('</body>', `
 <div id="custom-footer">
 
-<script src="https://crxcr1.com/popin/latest/popin-min.js"></script>
-<script>
-var crakPopInParamsIframe = {
-  url: 'https://t.mbsrv2.com/273605/9328/optimized?bo=2753,2754,2755,2756&po=6456&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
-  decryptUrl: false,
-  contentUrl: 'https://t.mbsrv2.com/273605/9328/optimized?bo=2753,2754,2755,2756&po=6456&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
-  decryptContentUrl: false,
-  contentType: 'iframe',
-  width: '85%',
-  height: '85%',
-  timeout: false,
-  delayClose: 0,
-  clickStart: false,
-  closeIntent: false,
-  postitialBehavior: true,
-  closeButtonColor: '#000',
-  closeCrossColor: '#fff',
-  shadow: true,
-  shadowColor: '#000',
-  shadowOpacity: '.5',
-  shadeColor: '#111',
-  shadeOpacity: '0',
-  border: '1px',
-  borderColor: '#000',
-  borderRadius: '0px',
-  leadOut: true,
-  animation: 'slide',
-  direction: 'up',
-  verticalPosition: 'center',
-  horizontalPosition: 'center',
-  expireDays: 0.01
-};
-</script>
+<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
+<script>mnpw.add('https://t.mbsrv2.com/273605/7020?bo=2753,2C2754,2C2755,2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {newTab: true, cookieExpires: 86401});</script>
 
   <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
 </div>
@@ -171,40 +140,8 @@ var crakPopInParamsIframe = {
         html += `
 <div id="custom-footer">
 
-
-<script src="https://crxcr1.com/popin/latest/popin-min.js"></script>
-<script>
-var crakPopInParamsIframe = {
-  url: 'https://t.mbsrv2.com/273605/9328/optimized?bo=2753,2754,2755,2756&po=6456&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
-  decryptUrl: false,
-  contentUrl: 'https://t.mbsrv2.com/273605/9328/optimized?bo=2753,2754,2755,2756&po=6456&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
-  decryptContentUrl: false,
-  contentType: 'iframe',
-  width: '85%',
-  height: '85%',
-  timeout: false,
-  delayClose: 0,
-  clickStart: false,
-  closeIntent: false,
-  postitialBehavior: true,
-  closeButtonColor: '#000',
-  closeCrossColor: '#fff',
-  shadow: true,
-  shadowColor: '#000',
-  shadowOpacity: '.5',
-  shadeColor: '#111',
-  shadeOpacity: '0',
-  border: '1px',
-  borderColor: '#000',
-  borderRadius: '0px',
-  leadOut: true,
-  animation: 'slide',
-  direction: 'up',
-  verticalPosition: 'center',
-  horizontalPosition: 'center',
-  expireDays: 0.01
-};
-</script>
+<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
+<script>mnpw.add('https://t.mbsrv2.com/273605/7020?bo=2753,2C2754,2C2755,2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {newTab: true, cookieExpires: 86401});</script>
   <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
 </div>
 <style>
