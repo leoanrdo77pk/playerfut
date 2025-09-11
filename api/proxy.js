@@ -119,10 +119,7 @@ module.exports = async (req, res) => {
       if (html.includes('</body>')) {
         html = html.replace('</body>', `
 <div id="custom-footer">
-  <a href="https://s.shopee.com.br/4VSYYPCHx2" target="_blank">
-    <img src="https://i.ibb.co/XfhTxV5g/Design-sem-nome-1.png" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
-  </a>
-  <!-- Bidvertiser2101686 -->
+  <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
 </div>
 <style>
   #custom-footer {
@@ -138,10 +135,7 @@ module.exports = async (req, res) => {
       } else {
         html += `
 <div id="custom-footer">
-  <a href="https://s.shopee.com.br/4VSYYPCHx2" target="_blank">
-    <img src="https://i.ibb.co/XfhTxV5g/Design-sem-nome-1.png" style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" alt="Banner" />
-  </a>
-  <!-- Bidvertiser2101686 -->
+  <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
 </div>
 <style>
   #custom-footer {
