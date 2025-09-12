@@ -120,7 +120,7 @@ module.exports = async (req, res) => {
         html = html.replace('</body>', `
 <div id="custom-footer">
 
-The text: "<a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/10163/Joi_202506_3..." has been added to clipboard
+<a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/10163/Joi_202506_3...</a>
 
   <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
 </div>
@@ -139,7 +139,7 @@ The text: "<a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_0
         html += `
 <div id="custom-footer">
 
-The text: "<a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/10163/Joi_202506_3..." has been added to clipboard
+<a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/10163/Joi_202506_3...</a>
   <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
 </div>
 <style>
