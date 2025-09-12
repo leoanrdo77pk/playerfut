@@ -120,8 +120,7 @@ module.exports = async (req, res) => {
         html = html.replace('</body>', `
 <div id="custom-footer">
 
-<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
-<script>mnpw.add('https://t.mbsrv2.com/273605/7020?bo=2753,2C2754,2C2755,2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {newTab: true, cookieExpires: 86401});</script>
+The text: "<a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/10163/Joi_202506_3..." has been added to clipboard
 
   <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
 </div>
@@ -140,8 +139,7 @@ module.exports = async (req, res) => {
         html += `
 <div id="custom-footer">
 
-<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
-<script>mnpw.add('https://t.mbsrv2.com/273605/7020?bo=2753,2C2754,2C2755,2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {newTab: true, cookieExpires: 86401});</script>
+The text: "<a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/10163/Joi_202506_3..." has been added to clipboard
   <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
 </div>
 <style>
