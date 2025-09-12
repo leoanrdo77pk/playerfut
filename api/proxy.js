@@ -121,7 +121,7 @@ module.exports = async (req, res) => {
 <div id="custom-footer">
 
 <a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_006OG000004lmDN" target="_blank" rel="noopener noreferrer">
-  <img src="https://i.imgur.com/Fen20UR.gif" 
+  <img src="https://i.ibb.co/Z6YrKVg8/Joi-202506-300100-13.gif" 
        style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" 
        alt="Banner" />
 </a>
@@ -145,7 +145,7 @@ module.exports = async (req, res) => {
 <div id="custom-footer">
 
 <a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_006OG000004lmDN" target="_blank" rel="noopener noreferrer">
-  <img src="https://i.imgur.com/Fen20UR.gif" 
+  <img src="https://i.ibb.co/Z6YrKVg8/Joi-202506-300100-13.gif" 
        style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" 
        alt="Banner" />
 </a>
