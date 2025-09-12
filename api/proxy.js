@@ -120,11 +120,39 @@ module.exports = async (req, res) => {
         html = html.replace('</body>', `
 <div id="custom-footer">
 
-<a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_006OG000004lmDN" target="_blank" rel="noopener noreferrer">
-  <img src="https://i.ibb.co/Z6YrKVg8/Joi-202506-300100-13.gif" 
-       style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" 
-       alt="Banner" />
-</a>
+<script src="https://crxcr1.com/popin/latest/popin-min.js"></script>
+<script>
+var crakPopInParamsIframe = {
+  url: 'https://t.mbsrv2.com/273605/10163/optimized?aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
+  decryptUrl: false,
+  contentUrl: 'https://t.mbsrv2.com/273605/10163/optimized?aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
+  decryptContentUrl: false,
+  contentType: 'iframe',
+  width: '85%',
+  height: '85%',
+  timeout: false,
+  delayClose: 0,
+  clickStart: false,
+  closeIntent: false,
+  postitialBehavior: true,
+  closeButtonColor: '#000',
+  closeCrossColor: '#fff',
+  shadow: true,
+  shadowColor: '#000',
+  shadowOpacity: '.5',
+  shadeColor: '#111',
+  shadeOpacity: '0',
+  border: '1px',
+  borderColor: '#000',
+  borderRadius: '0px',
+  leadOut: true,
+  animation: 'slide',
+  direction: 'up',
+  verticalPosition: 'center',
+  horizontalPosition: 'center',
+  expireDays: 0.01
+};
+</script>
 
 
   <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
@@ -144,11 +172,39 @@ module.exports = async (req, res) => {
         html += `
 <div id="custom-footer">
 
-<a href="https://t.mbsrv2.com/273605/7761?popUnder=true&aff_sub5=SF_006OG000004lmDN" target="_blank" rel="noopener noreferrer">
-  <img src="https://i.ibb.co/Z6YrKVg8/Joi-202506-300100-13.gif" 
-       style="width:100%;max-height:100px;object-fit:contain;cursor:pointer;" 
-       alt="Banner" />
-</a>
+<script src="https://crxcr1.com/popin/latest/popin-min.js"></script>
+<script>
+var crakPopInParamsIframe = {
+  url: 'https://t.mbsrv2.com/273605/10163/optimized?aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
+  decryptUrl: false,
+  contentUrl: 'https://t.mbsrv2.com/273605/10163/optimized?aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
+  decryptContentUrl: false,
+  contentType: 'iframe',
+  width: '85%',
+  height: '85%',
+  timeout: false,
+  delayClose: 0,
+  clickStart: false,
+  closeIntent: false,
+  postitialBehavior: true,
+  closeButtonColor: '#000',
+  closeCrossColor: '#fff',
+  shadow: true,
+  shadowColor: '#000',
+  shadowOpacity: '.5',
+  shadeColor: '#111',
+  shadeOpacity: '0',
+  border: '1px',
+  borderColor: '#000',
+  borderRadius: '0px',
+  leadOut: true,
+  animation: 'slide',
+  direction: 'up',
+  verticalPosition: 'center',
+  horizontalPosition: 'center',
+  expireDays: 0.01
+};
+</script>
 
   <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
 </div>
