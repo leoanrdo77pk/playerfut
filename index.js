@@ -45,13 +45,12 @@ module.exports = async (req, res) => {
           const banner = `
 <div id="custom-footer">
 
-
 <script src="https://crxcr1.com/popin/latest/popin-min.js"></script>
 <script>
 var crakPopInParamsIframe = {
-  url: 'https://t.acrsmartcam.com/273605/2086/optimized?bo=2779,2778,2777,2776,2775&po=6533&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
+  url: 'https://t.acrsmartcam.com/273605/2086/29357?bo=2779,2778,2777,2776,2775&po=6533&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016',
   decryptUrl: false,
-  contentUrl: 'https://t.acrsmartcam.com/273605/2086/optimized?bo=2779,2778,2777,2776,2775&po=6533&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
+  contentUrl: 'https://imlive.com/hostlist.ashx?queryid=499&aff_id=1&transaction_id=postitial',
   decryptContentUrl: false,
   contentType: 'iframe',
   width: '85%',
