@@ -47,7 +47,7 @@ module.exports = async (req, res) => {
 
 <a href="https://t.acrsmartcam.com/273605/3484?bo=2779,2778,2777,2776,2775&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/2086/ImLive_20241002_static_banner_900x230.jpg" width="1000" height="230" border="0" /></a>
 
- 
+<script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.acrsmartcam.com/273605/3484?bo=2779%2C2778%2C2777%2C2776%2C2775&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script> 
 </div>
 `;
 
