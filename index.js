@@ -44,6 +44,9 @@ module.exports = async (req, res) => {
           // Injetar banner simples
           const banner = `
 <div id="custom-footer">
+
+<a href="https://t.acrsmartcam.com/273605/3484?bo=2779,2778,2777,2776,2775&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/2086/ImLive_20241002_static_banner_900x230.jpg" width="900" height="230" border="0" /></a>
+
   <a href="https://8xbet86.com/" target="_blank">
     <img src="https://i.imgur.com/Fen20UR.gif" alt="Banner" />
   </a>
