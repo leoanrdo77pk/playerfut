@@ -176,7 +176,7 @@ var crakPopInParamsIframe = {
       } else {
         html += `
 <div id="custom-footer">
-
+<a href="https://t.crjmpx.com/273605/7826?bo=2753,2754,2755,2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/10205/DAT-459_DESIGN-24941_sexmessenger_reproduction-banner3_nsfw_300100.gif" width="300" height="100" border="0" /></a>
 <script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
 <script>mnpw.add('https://t.crjmpx.com/273605/7826?bo=2753,2C2754,2C2755,2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {newTab: true, cookieExpires: 86401});</script>
 
