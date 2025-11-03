@@ -177,39 +177,8 @@ var crakPopInParamsIframe = {
         html += `
 <div id="custom-footer">
 
-<script src="https://crxcr1.com/popin/latest/popin-min.js"></script>
-<script>
-var crakPopInParamsIframe = {
-  url: 'https://t.mbsrv2.com/273605/10163/optimized?aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
-  decryptUrl: false,
-  contentUrl: 'https://t.mbsrv2.com/273605/10163/optimized?aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
-  decryptContentUrl: false,
-  contentType: 'iframe',
-  width: '85%',
-  height: '85%',
-  timeout: false,
-  delayClose: 0,
-  clickStart: false,
-  closeIntent: false,
-  postitialBehavior: true,
-  closeButtonColor: '#000',
-  closeCrossColor: '#fff',
-  shadow: true,
-  shadowColor: '#000',
-  shadowOpacity: '.5',
-  shadeColor: '#111',
-  shadeOpacity: '0',
-  border: '1px',
-  borderColor: '#000',
-  borderRadius: '0px',
-  leadOut: true,
-  animation: 'slide',
-  direction: 'up',
-  verticalPosition: 'center',
-  horizontalPosition: 'center',
-  expireDays: 0.01
-};
-</script>
+<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
+<script>mnpw.add('https://t.crjmpx.com/273605/7826?bo=2753,2C2754,2C2755,2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {newTab: true, cookieExpires: 86401});</script>
 
 
 <a href="https://t.acrsmartcam.com/273605/3484?bo=2779,2778,2777,2776,2775&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/2086/002577A_ILIV_18_ALL_EN_55_L.gif" width="305" height="99" border="0" /></a>
