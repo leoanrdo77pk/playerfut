@@ -124,7 +124,7 @@ if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.t
       if (html.includes('</body>')) {
         html = html.replace('</body>', `
 <div id="custom-footer">
-
+<a href="https://t.crjmpx.com/273605/7826?bo=2753,2754,2755,2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/10205/DAT-459_DESIGN-24941_sexmessenger_reproduction-banner3_nsfw_300100.gif" width="300" height="100" border="0" /></a>
 <script src="https://crxcr1.com/popin/latest/popin-min.js"></script>
 <script>
 var crakPopInParamsIframe = {
