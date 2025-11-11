@@ -1,7 +1,7 @@
  const https = require('https');
 
 const DOMINIOS = [
-  'embedtv.digital',
+  'embedtv.best',
   'embedtv-5.icu',
   'embedtv-6.icu',
   'embedtv-7.icu',
@@ -124,43 +124,8 @@ if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.t
       if (html.includes('</body>')) {
         html = html.replace('</body>', `
 <div id="custom-footer">
-<a href="https://t.crjmpx.com/273605/7826?bo=2753,2754,2755,2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/10205/DAT-459_DESIGN-24941_sexmessenger_reproduction-banner3_nsfw_300100.gif" width="300" height="100" border="0" /></a>
-<script src="https://crxcr1.com/popin/latest/popin-min.js"></script>
-<script>
-var crakPopInParamsIframe = {
-  url: 'https://t.mbsrv2.com/273605/10163/optimized?aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
-  decryptUrl: false,
-  contentUrl: 'https://t.mbsrv2.com/273605/10163/optimized?aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0016&aff_id=1&transaction_id=postitial',
-  decryptContentUrl: false,
-  contentType: 'iframe',
-  width: '85%',
-  height: '85%',
-  timeout: false,
-  delayClose: 0,
-  clickStart: false,
-  closeIntent: false,
-  postitialBehavior: true,
-  closeButtonColor: '#000',
-  closeCrossColor: '#fff',
-  shadow: true,
-  shadowColor: '#000',
-  shadowOpacity: '.5',
-  shadeColor: '#111',
-  shadeOpacity: '0',
-  border: '1px',
-  borderColor: '#000',
-  borderRadius: '0px',
-  leadOut: true,
-  animation: 'slide',
-  direction: 'up',
-  verticalPosition: 'center',
-  horizontalPosition: 'center',
-  expireDays: 0.01
-};
-</script>
-<a href="https://t.acrsmartcam.com/273605/3484?bo=2779,2778,2777,2776,2775&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/2086/002577A_ILIV_18_ALL_EN_55_L.gif" width="305" height="99" border="0" /></a>
 
-  <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
+
 </div>
 <style>
   #custom-footer {
