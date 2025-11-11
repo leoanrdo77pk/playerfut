@@ -1,4 +1,4 @@
- const https = require('https');
+const https = require('https');
 
 const DOMINIOS = [
   'embedtv.best',
@@ -15,7 +15,6 @@ function fetchUrl(url, reqHeaders) {
         res.on('data', chunk => data += chunk);
         res.on('end', () => resolve({ res, data }));
       } else {
-        // Não é 200, rejeita para tentar próximo domínio
         res.resume(); // descarta dados
         reject(new Error('Status ' + res.statusCode));
       }
@@ -41,10 +40,8 @@ module.exports = async (req, res) => {
         const url = `https://${dominio}${path}`;
         fetched = await fetchUrl(url, reqHeaders);
         dominioUsado = dominio;
-        break; // achou, sai do loop
-      } catch (_) {
-        // continua tentando próximo domínio
-      }
+        break;
+      } catch (_) {}
     }
 
     if (!fetched) {
@@ -58,7 +55,6 @@ module.exports = async (req, res) => {
     if (/\.m3u8$/i.test(path)) {
       let playlist = data.replace(/(.*\.ts)/g, (match) => {
         if (match.startsWith('http')) {
-          // troca domínio para relativo ao proxy
           return match.replace(new RegExp(`https?:\/\/${dominioUsado}\/`), '/');
         }
         return `/${match}`;
@@ -70,34 +66,30 @@ module.exports = async (req, res) => {
       return res.end(playlist);
     }
 
-    // Se for arquivo estático (ts, mp4, imagens, css, js), faz proxy direto (stream)
-   // Proxy para arquivos estáticos (corrigido para imagens e assets)
-if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.test(path)) {
-  const fileUrl = `https://${dominioUsado}${path.startsWith('/') ? path : '/' + path}`;
+    // Proxy para arquivos estáticos
+    if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.test(path)) {
+      const fileUrl = `https://${dominioUsado}${path.startsWith('/') ? path : '/' + path}`;
+      https.get(fileUrl, { headers: reqHeaders }, (streamResp) => {
+        res.writeHead(streamResp.statusCode, streamResp.headers);
+        streamResp.pipe(res);
+      }).on('error', (err) => {
+        console.error('Erro proxy estático:', err);
+        res.statusCode = 500;
+        res.end('Erro ao carregar assets.');
+      });
+      return;
+    }
 
-  https.get(fileUrl, { headers: reqHeaders }, (streamResp) => {
-    res.writeHead(streamResp.statusCode, streamResp.headers);
-    streamResp.pipe(res);
-  }).on('error', (err) => {
-    console.error('Erro proxy estático:', err);
-    res.statusCode = 500;
-    res.end('Erro ao carregar assets.');
-  });
-
-  return;
-}
-
-
-    // Se for HTML, reescreve links para manter no seu domínio
+    // Se for HTML, reescreve links e remove cabeçalho
     if (respOrig.headers['content-type'] && respOrig.headers['content-type'].includes('text/html')) {
       let html = data;
 
-      // Remove headers que bloqueiam iframe, CSP, etc.
+      // Remove headers que bloqueiam iframe e CSP
       const headers = { ...respOrig.headers };
       delete headers['x-frame-options'];
       delete headers['content-security-policy'];
 
-      // Reescreve os links dos domínios para relativos
+      // Reescreve links para manter no seu domínio
       const dominioRegex = new RegExp(`https?:\/\/(?:${DOMINIOS.join('|')})\/`, 'g');
       html = html.replace(dominioRegex, '/');
 
@@ -115,12 +107,24 @@ if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.t
         .replace(/href="\/([^"]+)"/g, 'href="/$1"')
         .replace(/action="\/([^"]+)"/g, 'action="/$1"');
 
-      // Trocar título e remover ícone
+      // 🔹 REMOVE cabeçalhos visuais do site original
+      html = html
+        .replace(/<header[\s\S]*?<\/header>/gi, '') // remove <header>...</header>
+        .replace(/<div[^>]*id=["']header["'][^>]*>[\s\S]*?<\/div>/gi, '') // remove <div id="header">
+        .replace(/<nav[\s\S]*?<\/nav>/gi, ''); // remove menus de navegação
+
+      // 🔹 Trocar título e remover ícone
       html = html
         .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
         .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
 
-      // Injetar banner no fim
+      // 🔹 Injetar meta tag de verificação no <head>
+      html = html.replace(
+        /<head>/i,
+        `<head>\n<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`
+      );
+
+      // 🔹 Injetar banner no fim
       if (html.includes('</body>')) {
         html = html.replace('</body>', `
 <div id="custom-footer">
@@ -143,28 +147,6 @@ if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.t
   body { padding-bottom: 120px !important; }
 </style>
 </body>`);
-      } else {
-        html += `
-<div id="custom-footer">
-<a href="https://t.crjmpx.com/273605/7826?bo=2753,2754,2755,2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/10205/DAT-459_DESIGN-24941_sexmessenger_reproduction-banner3_nsfw_300100.gif" width="300" height="100" border="0" /></a>
-<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
-<script>mnpw.add('https://t.crjmpx.com/273605/7826?bo=2753,2C2754,2C2755,2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {newTab: true, cookieExpires: 86401});</script>
-
-
-<a href="https://t.acrsmartcam.com/273605/3484?bo=2779,2778,2777,2776,2775&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0002" target="_blank"><img src="https://www.imglnkx.com/2086/002577A_ILIV_18_ALL_EN_55_L.gif" width="305" height="99" border="0" /></a>
-
-  <script defer src=https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbsrv2.com/273605/7020?bo=2753%2C2754%2C2755%2C2756&popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018></script>
-</div>
-<style>
-  #custom-footer {
-    position: fixed;
-    bottom: 0; left: 0; width: 100%;
-    background: transparent;
-    text-align: center;
-    z-index: 9999;
-  }
-  body { padding-bottom: 120px !important; }
-</style>`;
       }
 
       res.writeHead(200, {
@@ -175,7 +157,7 @@ if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.t
       return res.end(html);
     }
 
-    // Para outros tipos, só repassa puro
+    // Outros tipos: envia direto
     res.writeHead(respOrig.statusCode, respOrig.headers);
     res.end(data);
 
