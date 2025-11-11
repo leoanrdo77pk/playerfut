@@ -1,6 +1,3 @@
-
-
-
 const https = require('https');
 
 module.exports = async (req, res) => {
@@ -36,10 +33,11 @@ module.exports = async (req, res) => {
             .replace(/<iframe([^>]*)src=["']https:\/\/futebol7k\.com\/([^"']+)["']/g, '<iframe$1src="/$2"')
             .replace(/<base[^>]*>/gi, '');
 
-          // Alterar título e remover ícone
+          // Alterar título, remover ícone e inserir meta de verificação
           data = data
             .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
-            .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
+            .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
+            .replace(/<head>/i, `<head>\n<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`);
 
           // **Remover todos os scripts (pop-ups e anúncios)**
           data = data.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
@@ -47,21 +45,14 @@ module.exports = async (req, res) => {
           // Injetar banner simples
           const banner = `
 <div id="custom-footer">
-
-
-
 <script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
-<script>mnpw.add('https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {newTab: true, cookieExpires: 86401});</script>
-
-
-
-
-
-
-
-
-
-
+<script>
+mnpw.add('https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {
+  newTab: true,
+  cookieExpires: 86401
+});
+</script>
+</div>
 `;
 
           let finalHtml;
