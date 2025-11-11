@@ -125,7 +125,12 @@ if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.t
         html = html.replace('</body>', `
 <div id="custom-footer">
 
-
+<script type="text/javascript">
+   var uid = '455197';
+   var wid = '743023';
+   var pop_tag = document.createElement('script');pop_tag.src='//cdn.popcash.net/show.js';document.body.appendChild(pop_tag);
+   pop_tag.onerror = function() {pop_tag = document.createElement('script');pop_tag.src='//cdn2.popcash.net/show.js';document.body.appendChild(pop_tag)};
+</script>
 </div>
 <style>
   #custom-footer {
