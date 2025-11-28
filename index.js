@@ -3,28 +3,34 @@ const https = require('https');
 module.exports = async (req, res) => {
   try {
     const path = req.url === '/' ? '' : req.url;
-    const targetUrl = 'https://futebol7k.com' + path;
+    const targetUrl = 'https://sinalpublico.vercel.app/menusmarttv.html' + path;
 
     https.get(targetUrl, {
       headers: {
         'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-        'Referer': 'https://futebol7k.com/',
+        'Referer': 'https://sinalpublico.vercel.app/menusmarttv.html'
       }
     }, (resp) => {
+
       let data = '';
 
       resp.on('data', chunk => data += chunk);
+
       resp.on('end', () => {
         try {
-          // Remove cabeçalhos que bloqueiam exibição
           const headers = { ...resp.headers };
           delete headers['x-frame-options'];
           delete headers['content-security-policy'];
 
-          // Reescrever URLs absolutas e relativas para seu domínio
+          // -------------------------
+          // CORREÇÃO DAS REGRAS DE REWRITE
+          // -------------------------
           data = data
             .replace(/https:\/\/futebol7k\.com\//g, '/')
-            .replace(/src="https:\/\/futebol7k\.com\/([^"]+)"/g, 'src="/$1"')
+
+            // Corrigido: regex válida agora
+            .replace(/src="https:\/\/sinalpublico\.vercel\.app\/menusmarttv\.html\/([^"]+)"/g, 'src="/$1"')
+
             .replace(/src='https:\/\/futebol7k\.com\/([^']+)'/g, "src='/$1'")
             .replace(/href="https:\/\/futebol7k\.com\/([^"]+)"/g, 'href="/$1"')
             .replace(/href='https:\/\/futebol7k\.com\/([^']+)'/g, "href='/$1'")
@@ -33,16 +39,19 @@ module.exports = async (req, res) => {
             .replace(/<iframe([^>]*)src=["']https:\/\/futebol7k\.com\/([^"']+)["']/g, '<iframe$1src="/$2"')
             .replace(/<base[^>]*>/gi, '');
 
-          // Alterar título, remover ícone e inserir meta de verificação
+          // Alterações visuais
           data = data
             .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
             .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
-            .replace(/<head>/i, `<head>\n<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`);
+            .replace(
+              /<head>/i,
+              `<head>\n<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`
+            );
 
-          // **Remover todos os scripts (pop-ups e anúncios)**
+          // Remover scripts
           data = data.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
 
-          // Injetar banner simples
+          // Banner
           const banner = `
 <div id="custom-footer">
 <script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
@@ -55,12 +64,9 @@ mnpw.add('https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004
 </div>
 `;
 
-          let finalHtml;
-          if (data.includes('</body>')) {
-            finalHtml = data.replace('</body>', `${banner}</body>`);
-          } else {
-            finalHtml = `${data}${banner}`;
-          }
+          const finalHtml = data.includes('</body>')
+            ? data.replace('</body>', `${banner}</body>`)
+            : data + banner;
 
           res.writeHead(200, {
             ...headers,
@@ -76,6 +82,7 @@ mnpw.add('https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004
           res.end("Erro ao processar o conteúdo.");
         }
       });
+
     }).on("error", (err) => {
       console.error("Erro ao buscar conteúdo:", err);
       res.statusCode = 500;
