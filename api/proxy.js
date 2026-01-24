@@ -1,10 +1,8 @@
 const https = require('https');
 
 const DOMINIOS = [
-  'embedtv.best',
-  'embedtv-5.icu',
-  'embedtv-6.icu',
-  'embedtv-7.icu',
+  'futemaxbr.tv',
+  'www.futemaxbr.tv'
 ];
 
 function fetchUrl(url, reqHeaders) {
@@ -15,7 +13,7 @@ function fetchUrl(url, reqHeaders) {
         res.on('data', chunk => data += chunk);
         res.on('end', () => resolve({ res, data }));
       } else {
-        res.resume(); // descarta dados
+        res.resume();
         reject(new Error('Status ' + res.statusCode));
       }
     }).on('error', reject);
@@ -24,17 +22,18 @@ function fetchUrl(url, reqHeaders) {
 
 module.exports = async (req, res) => {
   try {
-    let path = req.url === '/' ? '' : req.url;
+    const path = req.url === '/' ? '' : req.url;
 
     const reqHeaders = {
-      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
       'Referer': `https://${DOMINIOS[0]}/`,
+      'Accept': '*/*'
     };
 
     let fetched = null;
     let dominioUsado = null;
 
-    // Tenta todos os domínios até achar o conteúdo
+    // 🔁 Tenta todos os domínios
     for (const dominio of DOMINIOS) {
       try {
         const url = `https://${dominio}${path}`;
@@ -46,19 +45,23 @@ module.exports = async (req, res) => {
 
     if (!fetched) {
       res.statusCode = 404;
-      return res.end('Conteúdo não encontrado em nenhum domínio.');
+      return res.end('Conteúdo não encontrado.');
     }
 
     const { res: respOrig, data } = fetched;
 
-    // Se for m3u8, reescreve os caminhos dos .ts para passarem pelo proxy
+    // 🔹 M3U8 → reescreve TS para proxy
     if (/\.m3u8$/i.test(path)) {
       let playlist = data.replace(/(.*\.ts)/g, (match) => {
         if (match.startsWith('http')) {
-          return match.replace(new RegExp(`https?:\/\/${dominioUsado}\/`), '/');
+          return match.replace(
+            new RegExp(`https?:\/\/${dominioUsado}\/`, 'i'),
+            '/'
+          );
         }
         return `/${match}`;
       });
+
       res.writeHead(200, {
         'Content-Type': 'application/vnd.apple.mpegurl',
         'Access-Control-Allow-Origin': '*'
@@ -66,85 +69,84 @@ module.exports = async (req, res) => {
       return res.end(playlist);
     }
 
-    // Proxy para arquivos estáticos
+    // 🔹 Proxy arquivos estáticos
     if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.test(path)) {
       const fileUrl = `https://${dominioUsado}${path.startsWith('/') ? path : '/' + path}`;
       https.get(fileUrl, { headers: reqHeaders }, (streamResp) => {
         res.writeHead(streamResp.statusCode, streamResp.headers);
         streamResp.pipe(res);
-      }).on('error', (err) => {
-        console.error('Erro proxy estático:', err);
+      }).on('error', () => {
         res.statusCode = 500;
-        res.end('Erro ao carregar assets.');
+        res.end('Erro ao carregar asset.');
       });
       return;
     }
 
-    // Se for HTML, reescreve links e remove cabeçalho
-    if (respOrig.headers['content-type'] && respOrig.headers['content-type'].includes('text/html')) {
+    // 🔹 HTML
+    if (respOrig.headers['content-type']?.includes('text/html')) {
       let html = data;
 
-      // Remove headers que bloqueiam iframe e CSP
       const headers = { ...respOrig.headers };
       delete headers['x-frame-options'];
       delete headers['content-security-policy'];
 
-      // Reescreve links para manter no seu domínio
-      const dominioRegex = new RegExp(`https?:\/\/(?:${DOMINIOS.join('|')})\/`, 'g');
+      // Reescreve domínios
+      const dominioRegex = new RegExp(`https?:\/\/(?:${DOMINIOS.join('|')})\/`, 'gi');
       html = html.replace(dominioRegex, '/');
 
+      // Reescrita de links Futemax
       html = html
-        .replace(/src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'src="/$1"')
-        .replace(/href=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'href="/$1"')
-        .replace(/action=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, 'action="/$1"')
-        .replace(/url\(["']?https?:\/\/(?:embedtv[^\/]+)\/(.*?)["']?\)/g, 'url("/$1")')
-        .replace(/<iframe([^>]*)src=["']https?:\/\/(?:embedtv[^\/]+)\/([^"']+)["']/g, '<iframe$1src="/$2"')
+        .replace(/src=["']https?:\/\/(?:futemaxbr[^\/]+)\/([^"']+)["']/gi, 'src="/$1"')
+        .replace(/href=["']https?:\/\/(?:futemaxbr[^\/]+)\/([^"']+)["']/gi, 'href="/$1"')
+        .replace(/action=["']https?:\/\/(?:futemaxbr[^\/]+)\/([^"']+)["']/gi, 'action="/$1"')
+        .replace(/url\(["']?https?:\/\/(?:futemaxbr[^\/]+)\/(.*?)["']?\)/gi, 'url("/$1")')
+        .replace(/<iframe([^>]*)src=["']https?:\/\/(?:futemaxbr[^\/]+)\/([^"']+)["']/gi, '<iframe$1src="/$2"')
         .replace(/<base[^>]*>/gi, '');
 
-      // Ajustes de links relativos
+      // Remove cabeçalhos e menus
       html = html
-        .replace(/href='\/([^']+)'/g, "href='/$1'")
-        .replace(/href="\/([^"]+)"/g, 'href="/$1"')
-        .replace(/action="\/([^"]+)"/g, 'action="/$1"');
+        .replace(/<header[\s\S]*?<\/header>/gi, '')
+        .replace(/<nav[\s\S]*?<\/nav>/gi, '')
+        .replace(/<div[^>]*id=["']header["'][^>]*>[\s\S]*?<\/div>/gi, '');
 
-      // 🔹 REMOVE cabeçalhos visuais do site original
+      // Título e favicon
       html = html
-        .replace(/<header[\s\S]*?<\/header>/gi, '') // remove <header>...</header>
-        .replace(/<div[^>]*id=["']header["'][^>]*>[\s\S]*?<\/div>/gi, '') // remove <div id="header">
-        .replace(/<nav[\s\S]*?<\/nav>/gi, ''); // remove menus de navegação
-
-      // 🔹 Trocar título e remover ícone
-      html = html
-        .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
+        .replace(/<title>[^<]*<\/title>/i, '<title>Futebol ao Vivo</title>')
         .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
 
-      // 🔹 Injetar meta tag de verificação no <head>
+      // Meta verificação
       html = html.replace(
         /<head>/i,
-        `<head>\n<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`
+        `<head>
+<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`
       );
 
-      // 🔹 Injetar banner no fim
+      // Banner final
       if (html.includes('</body>')) {
         html = html.replace('</body>', `
 <div id="custom-footer">
-
 <script type="text/javascript">
-   var uid = '455197';
-   var wid = '743023';
-   var pop_tag = document.createElement('script');pop_tag.src='//cdn.popcash.net/show.js';document.body.appendChild(pop_tag);
-   pop_tag.onerror = function() {pop_tag = document.createElement('script');pop_tag.src='//cdn2.popcash.net/show.js';document.body.appendChild(pop_tag)};
+  var uid = '455197';
+  var wid = '743023';
+  var pop_tag = document.createElement('script');
+  pop_tag.src='//cdn.popcash.net/show.js';
+  document.body.appendChild(pop_tag);
+  pop_tag.onerror = function() {
+    pop_tag = document.createElement('script');
+    pop_tag.src='//cdn2.popcash.net/show.js';
+    document.body.appendChild(pop_tag);
+  };
 </script>
 </div>
 <style>
-  #custom-footer {
-    position: fixed;
-    bottom: 0; left: 0; width: 100%;
-    background: transparent;
-    text-align: center;
-    z-index: 9999;
-  }
-  body { padding-bottom: 120px !important; }
+#custom-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+}
+body { padding-bottom: 120px !important; }
 </style>
 </body>`);
       }
@@ -152,12 +154,12 @@ module.exports = async (req, res) => {
       res.writeHead(200, {
         ...headers,
         'Access-Control-Allow-Origin': '*',
-        'Content-Type': respOrig.headers['content-type'] || 'text/html'
+        'Content-Type': headers['content-type'] || 'text/html'
       });
       return res.end(html);
     }
 
-    // Outros tipos: envia direto
+    // Outros conteúdos
     res.writeHead(respOrig.statusCode, respOrig.headers);
     res.end(data);
 
