@@ -2,7 +2,7 @@ const https = require('https');
 
 module.exports = async (req, res) => {
   try {
-    const path = req.url.replace(/\?.*$/, '');
+    const path = req.url.split('?')[0];
 
     const BLOGSPOT_URL =
       'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
@@ -10,20 +10,13 @@ module.exports = async (req, res) => {
     let targetUrl;
 
     // ==========================
-    // DEFINIÇÃO DE ROTAS
+    // ROTAS
     // ==========================
     if (path === '/' || path === '') {
+      // Página de cards (Blog)
       targetUrl = BLOGSPOT_URL;
-    }
-
-    // /rdcanais.top/espn/
-    else if (path.startsWith('/rdcanais.top/')) {
-      targetUrl =
-        'https://rdcanais.top/' + path.replace('/rdcanais.top/', '');
-    }
-
-    // /espn  → força como player
-    else {
+    } else {
+      // Player (rdcanais)
       targetUrl = 'https://rdcanais.top' + path;
     }
 
@@ -55,19 +48,19 @@ module.exports = async (req, res) => {
             // REWRITE HTML
             // ==========================
             data = data
-              // blogspot → relativo
+              // blogspot → links internos
               .replace(
                 /https:\/\/puroplaynovo\.blogspot\.com\/[^"'\s<>]+/gi,
                 (m) => new URL(m).pathname
               )
 
-              // rdcanais.top → relativo
+              // segurança extra (se sobrar rdcanais)
               .replace(
                 /https?:\/\/(?:www\.)?rdcanais\.top\/([^"'>\s]+)/gi,
                 '/$1'
               )
 
-              // bloquear window.location
+              // bloquear redirect JS
               .replace(
                 /window\.location(?:\.href)?\s*=\s*['"][^'"]+['"]/gi,
                 ''
@@ -92,7 +85,7 @@ module.exports = async (req, res) => {
               )
               .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
 
-            // ⚠️ NÃO remover scripts (player depende deles)
+            // ⚠️ NÃO remover scripts
 
             res.writeHead(200, {
               ...headers,
@@ -103,20 +96,20 @@ module.exports = async (req, res) => {
 
             res.end(data);
           } catch (err) {
-            console.error('Erro ao processar HTML:', err);
+            console.error('Erro HTML:', err);
             res.statusCode = 500;
-            res.end('Erro ao processar conteúdo.');
+            res.end('Erro ao processar página');
           }
         });
       }
     ).on('error', (err) => {
-      console.error('Erro ao buscar conteúdo:', err);
+      console.error('Erro request:', err);
       res.statusCode = 500;
-      res.end('Erro ao carregar conteúdo.');
+      res.end('Erro ao carregar conteúdo');
     });
   } catch (err) {
     console.error('Erro geral:', err);
     res.statusCode = 500;
-    res.end('Erro interno.');
+    res.end('Erro interno');
   }
 };
