@@ -1,141 +1,152 @@
 const https = require('https');
 
+const HOME_DOMAIN = 'puroplaynovo.blogspot.com';
+const HOME_PATH =
+  '/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html?m=1';
+
+const PLAYER_DOMAINS = ['rdcanais.top'];
+
+function fetchUrl(url, reqHeaders) {
+  return new Promise((resolve, reject) => {
+    https.get(url, { headers: reqHeaders }, (res) => {
+      if (res.statusCode === 200) {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => resolve({ res, data }));
+      } else {
+        res.resume();
+        reject(new Error('Status ' + res.statusCode));
+      }
+    }).on('error', reject);
+  });
+}
+
 module.exports = async (req, res) => {
   try {
-    const path = req.url === '/' ? '' : req.url;
+    const path = req.url === '/' ? '/' : req.url;
 
-    const BASE_URL =
-      'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html?m=1';
+    let targetUrl;
+    let dominioUsado;
 
-    const targetUrl = BASE_URL + path;
+    const reqHeaders = {
+      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+    };
 
-    https.get(
-      targetUrl,
-      {
-        headers: {
-          'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-          'Referer': BASE_URL,
-        },
-      },
-      (resp) => {
-        let data = '';
+    // ==========================
+    // HOME
+    // ==========================
+    if (path === '/' || path === HOME_PATH) {
+      targetUrl = `https://${HOME_DOMAIN}${HOME_PATH}`;
+      dominioUsado = HOME_DOMAIN;
+      reqHeaders.Referer = `https://${HOME_DOMAIN}/`;
+    } else {
+      // ==========================
+      // PLAYER
+      // ==========================
+      targetUrl = `https://${PLAYER_DOMAINS[0]}${path}`;
+      dominioUsado = PLAYER_DOMAINS[0];
+      reqHeaders.Referer = `https://${PLAYER_DOMAINS[0]}/`;
+    }
 
-        resp.setEncoding('utf8');
-        resp.on('data', (chunk) => (data += chunk));
+    const fetched = await fetchUrl(targetUrl, reqHeaders);
+    const { res: respOrig, data } = fetched;
 
-        resp.on('end', () => {
-          try {
-            // ==========================
-            // HEADERS
-            // ==========================
-            const headers = { ...resp.headers };
-            delete headers['x-frame-options'];
-            delete headers['content-security-policy'];
+    // ==========================
+    // M3U8
+    // ==========================
+    if (/\.m3u8$/i.test(path)) {
+      let playlist = data.replace(
+        new RegExp(`https?:\/\/${dominioUsado}\/`, 'g'),
+        '/'
+      );
 
-            // ==========================
-            // REWRITE HTML
-            // ==========================
-            data = data
-              // Blogspot absoluto → relativo
-              .replace(
-                /https:\/\/puroplaynovo\.blogspot\.com\/[^"'\s<>]+/gi,
-                (match) => {
-                  const url = new URL(match);
-                  return url.pathname;
-                }
-              )
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.apple.mpegurl',
+        'Access-Control-Allow-Origin': '*'
+      });
+      return res.end(playlist);
+    }
 
-              // rdcanais.top (qualquer canal) → proxy interno
-              .replace(
-                /https?:\/\/(?:www\.)?rdcanais\.top\/([^"'>\s]+)/gi,
-                '/$1'
-              )
+    // ==========================
+    // ASSETS
+    // ==========================
+    if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.test(path)) {
+      https.get(targetUrl, { headers: reqHeaders }, (streamResp) => {
+        res.writeHead(streamResp.statusCode, streamResp.headers);
+        streamResp.pipe(res);
+      }).on('error', () => {
+        res.statusCode = 500;
+        res.end('Erro ao carregar asset.');
+      });
+      return;
+    }
 
-              // bloquear redirects JS
-              .replace(
-                /window\.location(?:\.href)?\s*=\s*['"]https?:\/\/(?:www\.)?rdcanais\.top\/[^'"]+['"]/gi,
-                ''
-              )
+    // ==========================
+    // HTML
+    // ==========================
+    if (
+      respOrig.headers['content-type'] &&
+      respOrig.headers['content-type'].includes('text/html')
+    ) {
+      let html = data;
 
-              // bloquear meta refresh
-              .replace(
-                /<meta[^>]+http-equiv=["']refresh["'][^>]+>/gi,
-                ''
-              )
+      const headers = { ...respOrig.headers };
+      delete headers['x-frame-options'];
+      delete headers['content-security-policy'];
 
-              // remover <base>
-              .replace(/<base[^>]*>/gi, '');
+      // Rewrites
+      html = html
+        .replace(
+          new RegExp(`https?:\/\/${HOME_DOMAIN}\/`, 'gi'),
+          '/'
+        )
+        .replace(
+          new RegExp(`https?:\/\/${PLAYER_DOMAINS.join('|')}\/`, 'gi'),
+          '/'
+        )
+        .replace(/<base[^>]*>/gi, '');
 
-            // ==========================
-            // HEAD (SEO / META)
-            // ==========================
-            data = data
-              .replace(
-                /<title>[\s\S]*?<\/title>/i,
-                '<title>Futebol Ao Vivo</title>'
-              )
-              .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
-              .replace(
-                /<head>/i,
-                `<head>
+      // Head
+      html = html
+        .replace(/<title>[^<]*<\/title>/i, '<title>Futebol ao Vivo</title>')
+        .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
+        .replace(
+          /<head>/i,
+          `<head>
 <meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`
-              );
+        );
 
-            // ==========================
-            // REMOVER TODOS OS SCRIPTS ORIGINAIS
-            // ==========================
-            data = data.replace(
-              /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-              ''
-            );
-
-            // ==========================
-            // BANNER
-            // ==========================
-            const banner = `
-<div id="custom-footer">
-<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
-<script>
-mnpw.add(
-  'https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9',
-  {
-    newTab: true,
-    cookieExpires: 86401
-  }
-);
-</script>
+      // ==========================
+      // ESPAÇO BIDVERTISE
+      // ==========================
+      if (html.includes('</body>')) {
+        html = html.replace(
+          '</body>',
+          `
+<!-- BIDVERTISE -->
+<div id="bidvertise-banner">
+  <!-- COLE SEU SCRIPT AQUI -->
 </div>
-`;
 
-            const finalHtml = data.includes('</body>')
-              ? data.replace('</body>', banner + '\n</body>')
-              : data + banner;
-
-            // ==========================
-            // RESPONSE
-            // ==========================
-            res.writeHead(200, {
-              ...headers,
-              'Access-Control-Allow-Origin': '*',
-              'Content-Type':
-                resp.headers['content-type'] || 'text/html; charset=utf-8',
-            });
-
-            res.end(finalHtml);
-          } catch (err) {
-            console.error('Erro ao processar HTML:', err);
-            res.statusCode = 500;
-            res.end('Erro ao processar o conteúdo.');
-          }
-        });
+</body>`
+        );
       }
-    ).on('error', (err) => {
-      console.error('Erro ao buscar conteúdo:', err);
-      res.statusCode = 500;
-      res.end('Erro ao carregar conteúdo.');
-    });
+
+      res.writeHead(200, {
+        ...headers,
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': respOrig.headers['content-type']
+      });
+
+      return res.end(html);
+    }
+
+    // Outros
+    res.writeHead(respOrig.statusCode, respOrig.headers);
+    res.end(data);
+
   } catch (err) {
-    console.error('Erro geral:', err);
+    console.error('Erro geral proxy:', err);
     res.statusCode = 500;
     res.end('Erro interno.');
   }
