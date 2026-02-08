@@ -1,48 +1,62 @@
 const https = require('https');
 
-/**
- * ORIGEM ABSOLUTA E FIXA (Blogspot com ?m=1)
- */
-const ORIGEM_FIXA =
-  'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html?m=1';
+const ORIGEM = {
+  dominio: 'puroplaynovo.blogspot.com',
+  path: '/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html?m=1'
+};
 
-/**
- * DOMÍNIOS QUE NUNCA PODEM ABRIR
- */
 const DOMINIOS_BLOQUEADOS = [
   'rdcanais.top'
 ];
 
-function fetchUrl(url, headers = {}) {
+function fetchHtml(url, headers) {
   return new Promise((resolve, reject) => {
     https.get(url, { headers }, res => {
       let data = '';
       res.on('data', chunk => (data += chunk));
-      res.on('end', () => resolve(data));
+      res.on('end', () => resolve({ res, data }));
     }).on('error', reject);
   });
 }
 
 module.exports = async (req, res) => {
   try {
-    const targetUrl = req.query.url;
+    const targetUrl = `https://${ORIGEM.dominio}${ORIGEM.path}`;
 
-    if (!targetUrl) {
-      res.status(400).end('URL não informada');
-      return;
-    }
-
-    let html = await fetchUrl(targetUrl, {
-      'User-Agent': 'Mozilla/5.0',
-      Referer: ORIGEM_FIXA
+    const { res: origemRes, data } = await fetchHtml(targetUrl, {
+      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+      Referer: targetUrl
     });
 
-    /* =====================================================
-       1️⃣ REMOVE REDIRECIONAMENTOS FORÇADOS
-    ===================================================== */
+    let html = data;
 
+    /* ===============================
+       1️⃣ REWRITE DO BLOGSPOT
+    =============================== */
+
+    const blogRegex = new RegExp(
+      `https?:\/\/${ORIGEM.dominio}\/2025\/06\/futebol-ao-vivo-gratis-reset-margin-0.html\\?m=1`,
+      'gi'
+    );
+
+    html = html.replace(blogRegex, '/');
+
+    html = html
+      .replace(/href=["']https?:\/\/puroplaynovo\.blogspot\.com\/[^"']+["']/gi, 'href="/"')
+      .replace(/src=["']https?:\/\/puroplaynovo\.blogspot\.com\/[^"']+["']/gi, 'src="/"');
+
+    /* ===============================
+       2️⃣ BLOQUEIO TOTAL RDCANAIS
+    =============================== */
+
+    DOMINIOS_BLOQUEADOS.forEach(dom => {
+      const rx = new RegExp(`https?:\/\/${dom}\/[^"'\\s>]+`, 'gi');
+      html = html.replace(rx, '/');
+    });
+
+    /* remove scripts de redirect */
     html = html.replace(
-      /window\.location(\.href)?\s*=\s*['"][^'"]+['"]/gi,
+      /(window|document)\.location(\.href)?\s*=\s*['"][^'"]+['"]/gi,
       ''
     );
 
@@ -51,48 +65,35 @@ module.exports = async (req, res) => {
       ''
     );
 
-    html = html.replace(
-      /document\.location\s*=\s*['"][^'"]+['"]/gi,
-      ''
-    );
-
-    /* =====================================================
-       2️⃣ REMOVE META REFRESH
-    ===================================================== */
-
+    /* remove meta refresh */
     html = html.replace(
       /<meta[^>]+http-equiv=["']refresh["'][^>]*>/gi,
       ''
     );
 
-    /* =====================================================
-       3️⃣ BLOQUEIA QUALQUER LINK PARA RDCANAIS
-    ===================================================== */
+    /* ===============================
+       3️⃣ ESPAÇO PARA BIDVERTISER
+    =============================== */
 
-    html = html.replace(
-      /https?:\/\/(?:www\.)?rdcanais\.top\/[^"'<>\\s]+/gi,
-      ORIGEM_FIXA
-    );
+    const banner = `
+<!-- BIDVERTISER AQUI -->
+<div id="bidvertiser-banner"></div>
+`;
 
-    /* =====================================================
-       4️⃣ REMOVE IFRAME MALICIOSO
-    ===================================================== */
+    if (html.includes('</body>')) {
+      html = html.replace('</body>', `${banner}</body>`);
+    }
 
-    html = html.replace(
-      /<iframe[^>]+src=["']https?:\/\/(?:www\.)?rdcanais\.top\/[^"']+["'][^>]*><\/iframe>/gi,
-      ''
-    );
+    /* ===============================
+       4️⃣ HEADERS LIMPOS
+    =============================== */
 
-    /* =====================================================
-       5️⃣ LIMPEZA GERAL
-    ===================================================== */
-
-    DOMINIOS_BLOQUEADOS.forEach(dom => {
-      const rx = new RegExp(dom, 'gi');
-      html = html.replace(rx, '');
-    });
+    const headers = { ...origemRes.headers };
+    delete headers['x-frame-options'];
+    delete headers['content-security-policy'];
 
     res.writeHead(200, {
+      ...headers,
       'Content-Type': 'text/html; charset=utf-8',
       'Access-Control-Allow-Origin': '*'
     });
