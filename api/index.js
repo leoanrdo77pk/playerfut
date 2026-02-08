@@ -1,26 +1,54 @@
 module.exports = (req, res) => {
   try {
-    let path = req.url.split('?')[0];
-    path = path.replace(/^\/+/, '').toLowerCase();
+    let canal = req.url.split('?')[0];
+    canal = canal.replace(/^\/+/, '').toLowerCase();
 
-    if (!path || path === 'favicon.ico') {
-      res.statusCode = 404;
+    if (!canal || canal === 'favicon.ico') {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
       return res.end('Canal não informado');
     }
 
-    // monta URL do player
-    const targetUrl = `https://sinalpublico.vercel.app/play/dtv.html?id=${encodeURIComponent(path)}`;
+    const playerUrl = `https://sinalpublico.vercel.app/play/dtv.html?id=${encodeURIComponent(canal)}`;
 
-    // redirecionamento direto (mais rápido e estável)
-    res.writeHead(302, {
-      Location: targetUrl,
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'no-store'
     });
-    res.end();
+
+    res.end(`
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Assistir ${canal.toUpperCase()} Ao Vivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <iframe 
+    src="${playerUrl}" 
+    allowfullscreen 
+    allow="autoplay; encrypted-media">
+  </iframe>
+</body>
+</html>
+    `);
 
   } catch (err) {
-    console.error('Erro:', err);
-    res.statusCode = 500;
+    console.error(err);
+    res.writeHead(500, { 'Content-Type': 'text/plain' });
     res.end('Erro interno');
   }
 };
