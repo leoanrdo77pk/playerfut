@@ -1,103 +1,90 @@
-const http = require('http');
 const https = require('https');
-const { URL } = require('url');
 
-const PORT = 3000;
+module.exports = async (req, res) => {
+  try {
+    const path = req.url === '/' ? '' : req.url;
+    const targetUrl = 'https://rdcanais.top/' + path;
 
-// Blog tratado como domínio único
-const BLOG_DOMINIO = 'puroplaynovo.blogspot.com';
-const BLOG_PATH =
-  '/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html?m=1';
-
-// Proxy real do player
-const PLAYER_PROXY = 'playerfut.vercel.app';
-
-function handleProxy(req, res) {
-  let targetUrl;
-
-  // 👉 Player dinâmico
-  if (req.url.startsWith('/player/')) {
-    const id = req.url.replace('/player/', '');
-    targetUrl = `https://${PLAYER_PROXY}/rdcanais.top/${id}`;
-  } else {
-    // 👉 Página principal do blog
-    targetUrl = `https://${BLOG_DOMINIO}${BLOG_PATH}?m=1`;
-  }
-
-  const parsed = new URL(targetUrl);
-
-  const options = {
-    hostname: parsed.hostname,
-    path: parsed.pathname + parsed.search,
-    method: 'GET',
-    headers: {
-      'User-Agent': req.headers['user-agent'] || '',
-      'Accept': '*/*',
-      'Referer': `https://${BLOG_DOMINIO}/`
-    }
-  };
-
-  https.request(options, response => {
-    let body = '';
-
-    response.on('data', chunk => (body += chunk));
-
-    response.on('end', () => {
-      const type = response.headers['content-type'] || '';
-
-      if (type.includes('text/html')) {
-        body = body
-
-          // 🔁 Blogspot → proxy local
-          .replace(
-            /https?:\/\/puroplaynovo\.blogspot\.com\/2025\/06\/futebol-ao-vivo-gratis-reset-margin-0\.html\?m=1/g,
-            '/'
-          )
-
-          // 🔁 playerfut.vercel.app/rdcanais.top/{id}
-          .replace(
-            /https?:\/\/playerfut\.vercel\.app\/rdcanais\.top\/([a-zA-Z0-9_-]+)/g,
-            '/player/$1'
-          )
-
-          // 🔁 rdcanais.top/{id} direto
-          .replace(
-            /https?:\/\/rdcanais\.top\/([a-zA-Z0-9_-]+)/g,
-            '/player/$1'
-          )
-
-          // 🔁 href="/espn"
-          .replace(
-            /href="\/([a-zA-Z0-9_-]+)"/g,
-            'href="/player/$1"'
-          )
-
-          // 🔁 src="/espn"
-          .replace(
-            /src="\/([a-zA-Z0-9_-]+)"/g,
-            'src="/player/$1"'
-          )
-
-          // 🔁 action="/espn"
-          .replace(
-            /action="\/([a-zA-Z0-9_-]+)"/g,
-            'action="/player/$1"'
-          );
+    https.get(targetUrl, {
+      headers: {
+        'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+        'Referer': 'https://rdcanais.top/',
       }
+    }, (resp) => {
+      let data = '';
 
-      res.writeHead(200, {
-        'Content-Type': type || 'text/html'
-      });
-      res.end(body);
-    });
-  })
-  .on('error', err => {
-    res.writeHead(500);
-    res.end('Erro no proxy: ' + err.message);
-  })
-  .end();
-}
+      resp.on('data', chunk => data += chunk);
+      resp.on('end', () => {
+        try {
+          // Remove cabeçalhos que bloqueiam exibição
+          const headers = { ...resp.headers };
+          delete headers['x-frame-options'];
+          delete headers['content-security-policy'];
 
-http.createServer(handleProxy).listen(PORT, () => {
-  console.log(`🔥 Proxy rodando em http://localhost:${PORT}`);
+          // Reescrever URLs absolutas e relativas para seu domínio
+          data = data
+            .replace(/https:\/\/rdcanais\.top\//g, '/')
+            .replace(/src="https:\/\/rdcanais\.top\/([^"]+)"/g, 'src="/$1"')
+            .replace(/src='https:\/\/rdcanais\.top\/([^']+)'/g, "src='/$1'")
+            .replace(/href="https:\/\/rdcanais\.top\/([^"]+)"/g, 'href="/$1"')
+            .replace(/href='https:\/\/rdcanais\.top\/([^']+)'/g, "href='/$1'")
+            .replace(/action="https:\/\/rdcanais\.top\/([^"]+)"/g, 'action="/$1"')
+            .replace(/url\(["']?https:\/\/rdcanais\.top\/(.*?)["']?\)/g, 'url("/$1")')
+            .replace(/<iframe([^>]*)src=["']https:\/\/rdcanais\.top\/([^"']+)["']/g, '<iframe$1src="/$2"')
+            .replace(/<base[^>]*>/gi, '');
+
+          // Alterar título, remover ícone e inserir meta de verificação
+          data = data
+            .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
+            .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
+            .replace(/<head>/i, `<head>\n<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`);
+
+          // **Remover todos os scripts (pop-ups e anúncios)**
+          data = data.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+
+          // Injetar banner simples
+          const banner = `
+<div id="custom-footer">
+<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
+<script>
+mnpw.add('https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {
+  newTab: true,
+  cookieExpires: 86401
 });
+</script>
+</div>
+`;
+
+          let finalHtml;
+          if (data.includes('</body>')) {
+            finalHtml = data.replace('</body>', `${banner}</body>`);
+          } else {
+            finalHtml = `${data}${banner}`;
+          }
+
+          res.writeHead(200, {
+            ...headers,
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': resp.headers['content-type'] || 'text/html'
+          });
+
+          res.end(finalHtml);
+
+        } catch (err) {
+          console.error("Erro ao processar HTML:", err);
+          res.statusCode = 500;
+          res.end("Erro ao processar o conteúdo.");
+        }
+      });
+    }).on("error", (err) => {
+      console.error("Erro ao buscar conteúdo:", err);
+      res.statusCode = 500;
+      res.end("Erro ao carregar conteúdo.");
+    });
+
+  } catch (err) {
+    console.error("Erro geral:", err);
+    res.statusCode = 500;
+    res.end("Erro interno.");
+  }
+};
