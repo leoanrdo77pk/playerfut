@@ -5,12 +5,12 @@ module.exports = async (req, res) => {
     const path = req.url === '/' ? '' : req.url;
 
     // Página principal fixa
-    const targetUrl = 'https://sinalpublico.vercel.app/menusmarttv.html' + path;
+    const targetUrl = 'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html' + path;
 
     https.get(targetUrl, {
       headers: {
         'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-        'Referer': 'https://sinalpublico.vercel.app/menusmarttv.html'
+        'Referer': 'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html'
       }
     }, (resp) => {
 
@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
           data = data
 
             // remove URLs absolutas do domínio original
-            .replace(/https:\/\/sinalpublico\.vercel\.app\/menusmarttv\.html\/([^"']+)/g, '/$1')
+            .replace(/https:\/\/puroplaynovo\.blogspot\.com\/2025\.html\/([^"']+)/g, '/$1')
             .replace(/https:\/\/sinalpublico\.vercel\.app\/([^"']+)/g, '/$1')
 
             // src=""
