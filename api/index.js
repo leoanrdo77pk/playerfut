@@ -1,8 +1,8 @@
 const https = require('https');
 
-const PLAYER_BASE = 'https://www2.embedtv.best';
+const PLAYER_BASE = 'https://rdcanais.top';
 
-// lista de canais aceitos
+// canais permitidos
 const CANAIS = [
   'espn',
   'premiere',
@@ -18,7 +18,7 @@ module.exports = (req, res) => {
     let path = req.url.split('?')[0];
     path = path.replace(/^\/+/, '').toLowerCase();
 
-    // ignora favicon
+    // ignora raiz e favicon
     if (!path || path === 'favicon.ico') {
       res.statusCode = 404;
       return res.end('Canal não informado');
@@ -45,18 +45,20 @@ module.exports = (req, res) => {
       resp.on('data', chunk => (html += chunk));
 
       resp.on('end', () => {
-        // remove proteções básicas
-        res.removeHeader('X-Frame-Options');
-        res.removeHeader('Content-Security-Policy');
+        // remove headers de bloqueio
+        const responseHeaders = { ...resp.headers };
+        delete responseHeaders['x-frame-options'];
+        delete responseHeaders['content-security-policy'];
 
-        // reescreve links absolutos → relativos
+        // reescreve links para não sair do domínio
         html = html
-          .replace(/https?:\/\/www2\.embedtv\.best/gi, '')
-          .replace(/https?:\/\/embedtv\.best/gi, '')
-          .replace(/href="\//gi, 'href="/')
-          .replace(/src="\//gi, 'src="/');
+          .replace(/https?:\/\/(?:www\.)?rdcanais\.top/gi, '')
+          .replace(/window\.location\s*=\s*['"][^'"]+['"]/gi, '')
+          .replace(/<meta[^>]+http-equiv=["']refresh["'][^>]*>/gi, '')
+          .replace(/<base[^>]*>/gi, '');
 
         res.writeHead(200, {
+          ...responseHeaders,
           'Content-Type': 'text/html; charset=utf-8',
           'Access-Control-Allow-Origin': '*'
         });
@@ -64,9 +66,9 @@ module.exports = (req, res) => {
         res.end(html);
       });
     }).on('error', (err) => {
-      console.error('Erro proxy:', err);
+      console.error('Erro ao carregar player:', err);
       res.statusCode = 500;
-      res.end('Erro ao carregar player');
+      res.end('Erro ao carregar o player');
     });
 
   } catch (err) {
