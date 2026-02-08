@@ -7,16 +7,11 @@ module.exports = async (req, res) => {
     const BLOGSPOT_URL =
       'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
 
-    // ==========================
-    // DEFINIR DESTINO DINÂMICO
-    // ==========================
     let targetUrl;
 
     if (path === '/' || path === '') {
-      // Página principal
       targetUrl = BLOGSPOT_URL;
     } else {
-      // Qualquer canal → rdcanais.top
       targetUrl = 'https://rdcanais.top' + path;
     }
 
@@ -25,7 +20,7 @@ module.exports = async (req, res) => {
       {
         headers: {
           'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-          'Referer': targetUrl,
+          'Referer': 'https://rdcanais.top/',
         },
       },
       (resp) => {
@@ -36,38 +31,36 @@ module.exports = async (req, res) => {
 
         resp.on('end', () => {
           try {
-            // ==========================
-            // HEADERS
-            // ==========================
             const headers = { ...resp.headers };
             delete headers['x-frame-options'];
             delete headers['content-security-policy'];
+            delete headers['content-length'];
 
             // ==========================
-            // REWRITE HTML
+            // REWRITE LINKS
             // ==========================
             data = data
-              // blogspot → relativo
+              // Blogspot → relativo
               .replace(
                 /https:\/\/puroplaynovo\.blogspot\.com\/[^"'\s<>]+/gi,
-                (match) => new URL(match).pathname
+                (m) => new URL(m).pathname
               )
 
-              // rdcanais.top → relativo
+              // rdcanais → relativo
               .replace(
                 /https?:\/\/(?:www\.)?rdcanais\.top\/([^"'>\s]+)/gi,
                 '/$1'
               )
 
-              // bloquear redirects JS
+              // bloquear window.location
               .replace(
-                /window\.location(?:\.href)?\s*=\s*['"]https?:\/\/(?:www\.)?rdcanais\.top\/[^'"]+['"]/gi,
+                /window\.location(?:\.href)?\s*=\s*['"][^'"]+['"]/gi,
                 ''
               )
 
               // bloquear meta refresh
               .replace(
-                /<meta[^>]+http-equiv=["']refresh["'][^>]+>/gi,
+                /<meta[^>]+http-equiv=["']refresh["'][^>]*>/gi,
                 ''
               )
 
@@ -84,13 +77,7 @@ module.exports = async (req, res) => {
               )
               .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
 
-            // ==========================
-            // REMOVER SCRIPTS
-            // ==========================
-            data = data.replace(
-              /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-              ''
-            );
+            // ⚠️ NÃO remover scripts (player depende deles)
 
             res.writeHead(200, {
               ...headers,
