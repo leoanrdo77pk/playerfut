@@ -1,153 +1,103 @@
+const http = require('http');
 const https = require('https');
+const { URL } = require('url');
 
-const HOME_DOMAIN = 'puroplaynovo.blogspot.com';
-const HOME_PATH =
+const PORT = 3000;
+
+// Blog tratado como domínio único
+const BLOG_DOMINIO = 'puroplaynovo.blogspot.com';
+const BLOG_PATH =
   '/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html?m=1';
 
-const PLAYER_DOMAINS = ['rdcanais.top'];
+// Proxy real do player
+const PLAYER_PROXY = 'playerfut.vercel.app';
 
-function fetchUrl(url, reqHeaders) {
-  return new Promise((resolve, reject) => {
-    https.get(url, { headers: reqHeaders }, (res) => {
-      if (res.statusCode === 200) {
-        let data = '';
-        res.on('data', chunk => data += chunk);
-        res.on('end', () => resolve({ res, data }));
-      } else {
-        res.resume();
-        reject(new Error('Status ' + res.statusCode));
+function handleProxy(req, res) {
+  let targetUrl;
+
+  // 👉 Player dinâmico
+  if (req.url.startsWith('/player/')) {
+    const id = req.url.replace('/player/', '');
+    targetUrl = `https://${PLAYER_PROXY}/rdcanais.top/${id}`;
+  } else {
+    // 👉 Página principal do blog
+    targetUrl = `https://${BLOG_DOMINIO}${BLOG_PATH}?m=1`;
+  }
+
+  const parsed = new URL(targetUrl);
+
+  const options = {
+    hostname: parsed.hostname,
+    path: parsed.pathname + parsed.search,
+    method: 'GET',
+    headers: {
+      'User-Agent': req.headers['user-agent'] || '',
+      'Accept': '*/*',
+      'Referer': `https://${BLOG_DOMINIO}/`
+    }
+  };
+
+  https.request(options, response => {
+    let body = '';
+
+    response.on('data', chunk => (body += chunk));
+
+    response.on('end', () => {
+      const type = response.headers['content-type'] || '';
+
+      if (type.includes('text/html')) {
+        body = body
+
+          // 🔁 Blogspot → proxy local
+          .replace(
+            /https?:\/\/puroplaynovo\.blogspot\.com\/2025\/06\/futebol-ao-vivo-gratis-reset-margin-0\.html\?m=1/g,
+            '/'
+          )
+
+          // 🔁 playerfut.vercel.app/rdcanais.top/{id}
+          .replace(
+            /https?:\/\/playerfut\.vercel\.app\/rdcanais\.top\/([a-zA-Z0-9_-]+)/g,
+            '/player/$1'
+          )
+
+          // 🔁 rdcanais.top/{id} direto
+          .replace(
+            /https?:\/\/rdcanais\.top\/([a-zA-Z0-9_-]+)/g,
+            '/player/$1'
+          )
+
+          // 🔁 href="/espn"
+          .replace(
+            /href="\/([a-zA-Z0-9_-]+)"/g,
+            'href="/player/$1"'
+          )
+
+          // 🔁 src="/espn"
+          .replace(
+            /src="\/([a-zA-Z0-9_-]+)"/g,
+            'src="/player/$1"'
+          )
+
+          // 🔁 action="/espn"
+          .replace(
+            /action="\/([a-zA-Z0-9_-]+)"/g,
+            'action="/player/$1"'
+          );
       }
-    }).on('error', reject);
-  });
+
+      res.writeHead(200, {
+        'Content-Type': type || 'text/html'
+      });
+      res.end(body);
+    });
+  })
+  .on('error', err => {
+    res.writeHead(500);
+    res.end('Erro no proxy: ' + err.message);
+  })
+  .end();
 }
 
-module.exports = async (req, res) => {
-  try {
-    const path = req.url === '/' ? '/' : req.url;
-
-    let targetUrl;
-    let dominioUsado;
-
-    const reqHeaders = {
-      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-    };
-
-    // ==========================
-    // HOME
-    // ==========================
-    if (path === '/' || path === HOME_PATH) {
-      targetUrl = `https://${HOME_DOMAIN}${HOME_PATH}`;
-      dominioUsado = HOME_DOMAIN;
-      reqHeaders.Referer = `https://${HOME_DOMAIN}/`;
-    } else {
-      // ==========================
-      // PLAYER
-      // ==========================
-      targetUrl = `https://${PLAYER_DOMAINS[0]}${path}`;
-      dominioUsado = PLAYER_DOMAINS[0];
-      reqHeaders.Referer = `https://${PLAYER_DOMAINS[0]}/`;
-    }
-
-    const fetched = await fetchUrl(targetUrl, reqHeaders);
-    const { res: respOrig, data } = fetched;
-
-    // ==========================
-    // M3U8
-    // ==========================
-    if (/\.m3u8$/i.test(path)) {
-      let playlist = data.replace(
-        new RegExp(`https?:\/\/${dominioUsado}\/`, 'g'),
-        '/'
-      );
-
-      res.writeHead(200, {
-        'Content-Type': 'application/vnd.apple.mpegurl',
-        'Access-Control-Allow-Origin': '*'
-      });
-      return res.end(playlist);
-    }
-
-    // ==========================
-    // ASSETS
-    // ==========================
-    if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.test(path)) {
-      https.get(targetUrl, { headers: reqHeaders }, (streamResp) => {
-        res.writeHead(streamResp.statusCode, streamResp.headers);
-        streamResp.pipe(res);
-      }).on('error', () => {
-        res.statusCode = 500;
-        res.end('Erro ao carregar asset.');
-      });
-      return;
-    }
-
-    // ==========================
-    // HTML
-    // ==========================
-    if (
-      respOrig.headers['content-type'] &&
-      respOrig.headers['content-type'].includes('text/html')
-    ) {
-      let html = data;
-
-      const headers = { ...respOrig.headers };
-      delete headers['x-frame-options'];
-      delete headers['content-security-policy'];
-
-      // Rewrites
-      html = html
-        .replace(
-          new RegExp(`https?:\/\/${HOME_DOMAIN}\/`, 'gi'),
-          '/'
-        )
-        .replace(
-          new RegExp(`https?:\/\/${PLAYER_DOMAINS.join('|')}\/`, 'gi'),
-          '/'
-        )
-        .replace(/<base[^>]*>/gi, '');
-
-      // Head
-      html = html
-        .replace(/<title>[^<]*<\/title>/i, '<title>Futebol ao Vivo</title>')
-        .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
-        .replace(
-          /<head>/i,
-          `<head>
-<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`
-        );
-
-      // ==========================
-      // ESPAÇO BIDVERTISE
-      // ==========================
-      if (html.includes('</body>')) {
-        html = html.replace(
-          '</body>',
-          `
-<!-- BIDVERTISE -->
-<div id="bidvertise-banner">
-  <!-- COLE SEU SCRIPT AQUI -->
-</div>
-
-</body>`
-        );
-      }
-
-      res.writeHead(200, {
-        ...headers,
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': respOrig.headers['content-type']
-      });
-
-      return res.end(html);
-    }
-
-    // Outros
-    res.writeHead(respOrig.statusCode, respOrig.headers);
-    res.end(data);
-
-  } catch (err) {
-    console.error('Erro geral proxy:', err);
-    res.statusCode = 500;
-    res.end('Erro interno.');
-  }
-};
+http.createServer(handleProxy).listen(PORT, () => {
+  console.log(`🔥 Proxy rodando em http://localhost:${PORT}`);
+});
