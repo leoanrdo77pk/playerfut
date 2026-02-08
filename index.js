@@ -2,15 +2,11 @@ const https = require('https');
 
 module.exports = async (req, res) => {
   try {
-    const path = req.url === '/' ? '' : req.url;
-
     const BASE_URL =
       'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
 
-    const targetUrl = BASE_URL + path;
-
     https.get(
-      targetUrl,
+      BASE_URL,
       {
         headers: {
           'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
@@ -25,36 +21,28 @@ module.exports = async (req, res) => {
 
         resp.on('end', () => {
           try {
-            // Clonar headers e liberar iframe
+            // liberar iframe
             const headers = { ...resp.headers };
             delete headers['x-frame-options'];
             delete headers['content-security-policy'];
 
             // ==========================
-            // REWRITE APENAS BLOGSPOT
+            // AJUSTES NO HTML (SEM REWRITE DE URL)
             // ==========================
             data = data
-              // URLs absolutas do blogspot → relativas
-              .replace(
-                /https:\/\/puroplaynovo\.blogspot\.com\/[^"']+/g,
-                (match) => {
-                  const url = new URL(match);
-                  return url.pathname;
-                }
-              )
+              // remover <base> (evita conflitos)
+              .replace(/<base[^>]*>/gi, '')
 
-              // remover <base>
-              .replace(/<base[^>]*>/gi, '');
-
-            // ==========================
-            // HEAD
-            // ==========================
-            data = data
+              // título
               .replace(
                 /<title>[\s\S]*?<\/title>/i,
                 '<title>Futebol Ao Vivo</title>'
               )
+
+              // favicon
               .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
+
+              // meta extra
               .replace(
                 /<head>/i,
                 `<head>
@@ -62,7 +50,7 @@ module.exports = async (req, res) => {
               );
 
             // ==========================
-            // REMOVER TODOS OS SCRIPTS ORIGINAIS
+            // REMOVER SCRIPTS ORIGINAIS
             // ==========================
             data = data.replace(
               /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
