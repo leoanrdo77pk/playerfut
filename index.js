@@ -3,12 +3,12 @@ const https = require('https');
 module.exports = async (req, res) => {
   try {
     const path = req.url === '/' ? '' : req.url;
-    const targetUrl = 'https://rdcanais.top/' + path;
+    const targetUrl = 'https://puroplaynovo.blogspot.com/' + path;
 
     https.get(targetUrl, {
       headers: {
         'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-        'Referer': 'https://rdcanais.top/',
+        'Referer': 'https://puroplaynovo.blogspot.com/',
       }
     }, (resp) => {
       let data = '';
