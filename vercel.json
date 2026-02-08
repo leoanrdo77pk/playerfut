@@ -2,7 +2,7 @@
   "version": 2,
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/(espn|premiere|sportv|combate|ufc|tnt|bandsports)",
       "dest": "/api/index.js"
     }
   ]
