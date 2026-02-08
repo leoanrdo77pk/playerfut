@@ -2,89 +2,119 @@ const https = require('https');
 
 module.exports = async (req, res) => {
   try {
-    const path = req.url === '/' ? '' : req.url;
-    const targetUrl = 'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html/' + path;
+    const path = req.url;
 
-    https.get(targetUrl, {
-      headers: {
-        'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-        'Referer': 'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html/',
-      }
-    }, (resp) => {
-      let data = '';
+    const BLOGSPOT_URL =
+      'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
 
-      resp.on('data', chunk => data += chunk);
-      resp.on('end', () => {
-        try {
-          // Remove cabeçalhos que bloqueiam exibição
-          const headers = { ...resp.headers };
-          delete headers['x-frame-options'];
-          delete headers['content-security-policy'];
+    // ==========================
+    // DEFINIR DESTINO DINÂMICO
+    // ==========================
+    let targetUrl;
 
-          // Reescrever URLs absolutas e relativas para seu domínio
-          data = data
-            .replace(/https:\/\/rdcanais\.top\//g, '/')
-            .replace(/src="https:\/\/rdcanais\.top\/([^"]+)"/g, 'src="/$1"')
-            .replace(/src='https:\/\/rdcanais\.top\/([^']+)'/g, "src='/$1'")
-            .replace(/href="https:\/\/rdcanais\.top\/([^"]+)"/g, 'href="/$1"')
-            .replace(/href='https:\/\/rdcanais\.top\/([^']+)'/g, "href='/$1'")
-            .replace(/action="https:\/\/rdcanais\.top\/([^"]+)"/g, 'action="/$1"')
-            .replace(/url\(["']?https:\/\/rdcanais\.top\/(.*?)["']?\)/g, 'url("/$1")')
-            .replace(/<iframe([^>]*)src=["']https:\/\/rdcanais\.top\/([^"']+)["']/g, '<iframe$1src="/$2"')
-            .replace(/<base[^>]*>/gi, '');
+    if (path === '/' || path === '') {
+      // Página principal
+      targetUrl = BLOGSPOT_URL;
+    } else {
+      // Qualquer canal → rdcanais.top
+      targetUrl = 'https://rdcanais.top' + path;
+    }
 
-          // Alterar título, remover ícone e inserir meta de verificação
-          data = data
-            .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
-            .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
-            .replace(/<head>/i, `<head>\n<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`);
+    https.get(
+      targetUrl,
+      {
+        headers: {
+          'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+          'Referer': targetUrl,
+        },
+      },
+      (resp) => {
+        let data = '';
 
-          // **Remover todos os scripts (pop-ups e anúncios)**
-          data = data.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+        resp.setEncoding('utf8');
+        resp.on('data', (chunk) => (data += chunk));
 
-          // Injetar banner simples
-          const banner = `
-<div id="custom-footer">
-<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
-<script>
-mnpw.add('https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {
-  newTab: true,
-  cookieExpires: 86401
-});
-</script>
-</div>
-`;
+        resp.on('end', () => {
+          try {
+            // ==========================
+            // HEADERS
+            // ==========================
+            const headers = { ...resp.headers };
+            delete headers['x-frame-options'];
+            delete headers['content-security-policy'];
 
-          let finalHtml;
-          if (data.includes('</body>')) {
-            finalHtml = data.replace('</body>', `${banner}</body>`);
-          } else {
-            finalHtml = `${data}${banner}`;
+            // ==========================
+            // REWRITE HTML
+            // ==========================
+            data = data
+              // blogspot → relativo
+              .replace(
+                /https:\/\/puroplaynovo\.blogspot\.com\/[^"'\s<>]+/gi,
+                (match) => new URL(match).pathname
+              )
+
+              // rdcanais.top → relativo
+              .replace(
+                /https?:\/\/(?:www\.)?rdcanais\.top\/([^"'>\s]+)/gi,
+                '/$1'
+              )
+
+              // bloquear redirects JS
+              .replace(
+                /window\.location(?:\.href)?\s*=\s*['"]https?:\/\/(?:www\.)?rdcanais\.top\/[^'"]+['"]/gi,
+                ''
+              )
+
+              // bloquear meta refresh
+              .replace(
+                /<meta[^>]+http-equiv=["']refresh["'][^>]+>/gi,
+                ''
+              )
+
+              // remover base
+              .replace(/<base[^>]*>/gi, '');
+
+            // ==========================
+            // HEAD
+            // ==========================
+            data = data
+              .replace(
+                /<title>[\s\S]*?<\/title>/i,
+                '<title>Futebol Ao Vivo</title>'
+              )
+              .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
+
+            // ==========================
+            // REMOVER SCRIPTS
+            // ==========================
+            data = data.replace(
+              /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+              ''
+            );
+
+            res.writeHead(200, {
+              ...headers,
+              'Access-Control-Allow-Origin': '*',
+              'Content-Type':
+                resp.headers['content-type'] || 'text/html; charset=utf-8',
+            });
+
+            res.end(data);
+          } catch (err) {
+            console.error('Erro ao processar HTML:', err);
+            res.statusCode = 500;
+            res.end('Erro ao processar conteúdo.');
           }
-
-          res.writeHead(200, {
-            ...headers,
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': resp.headers['content-type'] || 'text/html'
-          });
-
-          res.end(finalHtml);
-
-        } catch (err) {
-          console.error("Erro ao processar HTML:", err);
-          res.statusCode = 500;
-          res.end("Erro ao processar o conteúdo.");
-        }
-      });
-    }).on("error", (err) => {
-      console.error("Erro ao buscar conteúdo:", err);
+        });
+      }
+    ).on('error', (err) => {
+      console.error('Erro ao buscar conteúdo:', err);
       res.statusCode = 500;
-      res.end("Erro ao carregar conteúdo.");
+      res.end('Erro ao carregar conteúdo.');
     });
-
   } catch (err) {
-    console.error("Erro geral:", err);
+    console.error('Erro geral:', err);
     res.statusCode = 500;
-    res.end("Erro interno.");
+    res.end('Erro interno.');
   }
 };
