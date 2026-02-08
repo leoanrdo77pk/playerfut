@@ -2,11 +2,15 @@ const https = require('https');
 
 module.exports = async (req, res) => {
   try {
+    const path = req.url === '/' ? '' : req.url;
+
     const BASE_URL =
       'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
 
+    const targetUrl = BASE_URL + path;
+
     https.get(
-      BASE_URL,
+      targetUrl,
       {
         headers: {
           'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
@@ -21,28 +25,56 @@ module.exports = async (req, res) => {
 
         resp.on('end', () => {
           try {
-            // liberar iframe
+            // ==========================
+            // HEADERS
+            // ==========================
             const headers = { ...resp.headers };
             delete headers['x-frame-options'];
             delete headers['content-security-policy'];
 
             // ==========================
-            // AJUSTES NO HTML (SEM REWRITE DE URL)
+            // REWRITE HTML
             // ==========================
             data = data
-              // remover <base> (evita conflitos)
-              .replace(/<base[^>]*>/gi, '')
+              // Blogspot absoluto → relativo
+              .replace(
+                /https:\/\/puroplaynovo\.blogspot\.com\/[^"'\s<>]+/gi,
+                (match) => {
+                  const url = new URL(match);
+                  return url.pathname;
+                }
+              )
 
-              // título
+              // rdcanais.top (qualquer canal) → proxy interno
+              .replace(
+                /https?:\/\/(?:www\.)?rdcanais\.top\/([^"'>\s]+)/gi,
+                '/$1'
+              )
+
+              // bloquear redirects JS
+              .replace(
+                /window\.location(?:\.href)?\s*=\s*['"]https?:\/\/(?:www\.)?rdcanais\.top\/[^'"]+['"]/gi,
+                ''
+              )
+
+              // bloquear meta refresh
+              .replace(
+                /<meta[^>]+http-equiv=["']refresh["'][^>]+>/gi,
+                ''
+              )
+
+              // remover <base>
+              .replace(/<base[^>]*>/gi, '');
+
+            // ==========================
+            // HEAD (SEO / META)
+            // ==========================
+            data = data
               .replace(
                 /<title>[\s\S]*?<\/title>/i,
                 '<title>Futebol Ao Vivo</title>'
               )
-
-              // favicon
               .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
-
-              // meta extra
               .replace(
                 /<head>/i,
                 `<head>
@@ -50,7 +82,7 @@ module.exports = async (req, res) => {
               );
 
             // ==========================
-            // REMOVER SCRIPTS ORIGINAIS
+            // REMOVER TODOS OS SCRIPTS ORIGINAIS
             // ==========================
             data = data.replace(
               /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
@@ -79,6 +111,9 @@ mnpw.add(
               ? data.replace('</body>', banner + '\n</body>')
               : data + banner;
 
+            // ==========================
+            // RESPONSE
+            // ==========================
             res.writeHead(200, {
               ...headers,
               'Access-Control-Allow-Origin': '*',
