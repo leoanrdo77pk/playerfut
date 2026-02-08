@@ -1,15 +1,22 @@
 const https = require('https');
 
-const ORIGEM = {
-  dominio: 'puroplaynovo.blogspot.com',
-  path: '/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html?m=1'
-};
+/**
+ * BLOGSPOT FIXO (HOME)
+ */
+const BLOG_ORIGEM =
+  'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html?m=1';
 
-const DOMINIOS_BLOQUEADOS = [
-  'rdcanais.top'
-];
+/**
+ * DOMÍNIO REAL DO PLAYER (BACKEND)
+ */
+const PLAYER_BACKEND = 'rdcanais.top';
 
-function fetchHtml(url, headers) {
+/**
+ * EXTENSÕES DE ARQUIVOS (proxy direto)
+ */
+const STATIC_REGEX = /\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp4|webm|ts|m3u8)$/i;
+
+function fetch(url, headers = {}) {
   return new Promise((resolve, reject) => {
     https.get(url, { headers }, res => {
       let data = '';
@@ -21,86 +28,135 @@ function fetchHtml(url, headers) {
 
 module.exports = async (req, res) => {
   try {
-    const targetUrl = `https://${ORIGEM.dominio}${ORIGEM.path}`;
+    const path = req.url === '/' ? '/' : req.url;
 
-    const { res: origemRes, data } = await fetchHtml(targetUrl, {
+    /* =====================================
+       1️⃣ HOME → BLOGSPOT
+    ===================================== */
+    if (path === '/') {
+      const { res: blogRes, data } = await fetch(BLOG_ORIGEM, {
+        'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+        Referer: BLOG_ORIGEM
+      });
+
+      let html = data;
+
+      /* Reescreve links do Blogspot para ficar no seu domínio */
+      html = html.replace(
+        /https?:\/\/puroplaynovo\.blogspot\.com\/2025\/06\/futebol-ao-vivo-gratis-reset-margin-0.html\?m=1/gi,
+        '/'
+      );
+
+      /* Remove redirects forçados */
+      html = html.replace(
+        /(window|document)\.location(\.href)?\s*=\s*['"][^'"]+['"]/gi,
+        ''
+      );
+
+      /* Espaço para BIDVERTISER */
+      const banner = `
+<!-- BIDVERTISER -->
+<div id="bidvertiser-banner"></div>
+`;
+
+      if (html.includes('</body>')) {
+        html = html.replace('</body>', `${banner}</body>`);
+      }
+
+      const headers = { ...blogRes.headers };
+      delete headers['x-frame-options'];
+      delete headers['content-security-policy'];
+
+      res.writeHead(200, {
+        ...headers,
+        'Content-Type': 'text/html; charset=utf-8'
+      });
+
+      return res.end(html);
+    }
+
+    /* =====================================
+       2️⃣ PLAYER → RDCANAIS (INVISÍVEL)
+    ===================================== */
+
+    const backendUrl = `https://${PLAYER_BACKEND}${path}`;
+
+    /* Arquivos estáticos / stream */
+    if (STATIC_REGEX.test(path)) {
+      https.get(
+        backendUrl,
+        {
+          headers: {
+            'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+            Referer: `https://${PLAYER_BACKEND}/`
+          }
+        },
+        backendRes => {
+          res.writeHead(backendRes.statusCode, backendRes.headers);
+          backendRes.pipe(res);
+        }
+      ).on('error', () => {
+        res.statusCode = 500;
+        res.end('Erro ao carregar mídia');
+      });
+      return;
+    }
+
+    /* HTML do player */
+    const { res: playerRes, data } = await fetch(backendUrl, {
       'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-      Referer: targetUrl
+      Referer: `https://${PLAYER_BACKEND}/`
     });
 
     let html = data;
 
-    /* ===============================
-       1️⃣ REWRITE DO BLOGSPOT
-    =============================== */
+    /* =====================================
+       3️⃣ REWRITE TOTAL DO RDCANAIS
+    ===================================== */
 
-    const blogRegex = new RegExp(
-      `https?:\/\/${ORIGEM.dominio}\/2025\/06\/futebol-ao-vivo-gratis-reset-margin-0.html\\?m=1`,
-      'gi'
-    );
+    /* Remove qualquer referência visível ao domínio */
+    const rdRegex = new RegExp(`https?:\/\/${PLAYER_BACKEND}`, 'gi');
+    html = html.replace(rdRegex, '');
 
-    html = html.replace(blogRegex, '/');
-
+    /* Reescreve src, href, action */
     html = html
-      .replace(/href=["']https?:\/\/puroplaynovo\.blogspot\.com\/[^"']+["']/gi, 'href="/"')
-      .replace(/src=["']https?:\/\/puroplaynovo\.blogspot\.com\/[^"']+["']/gi, 'src="/"');
+      .replace(/src=["']\/([^"']+)["']/gi, 'src="/$1"')
+      .replace(/href=["']\/([^"']+)["']/gi, 'href="/$1"')
+      .replace(/action=["']\/([^"']+)["']/gi, 'action="/$1"');
 
-    /* ===============================
-       2️⃣ BLOQUEIO TOTAL RDCANAIS
-    =============================== */
+    /* Remove base */
+    html = html.replace(/<base[^>]*>/gi, '');
 
-    DOMINIOS_BLOQUEADOS.forEach(dom => {
-      const rx = new RegExp(`https?:\/\/${dom}\/[^"'\\s>]+`, 'gi');
-      html = html.replace(rx, '/');
-    });
-
-    /* remove scripts de redirect */
+    /* Remove redirects JS */
     html = html.replace(
       /(window|document)\.location(\.href)?\s*=\s*['"][^'"]+['"]/gi,
       ''
     );
 
-    html = html.replace(
-      /location\.replace\s*\(\s*['"][^'"]+['"]\s*\)/gi,
-      ''
-    );
-
-    /* remove meta refresh */
+    /* Remove meta refresh */
     html = html.replace(
       /<meta[^>]+http-equiv=["']refresh["'][^>]*>/gi,
       ''
     );
 
-    /* ===============================
-       3️⃣ ESPAÇO PARA BIDVERTISER
-    =============================== */
-
-    const banner = `
-<!-- BIDVERTISER AQUI -->
-<div id="bidvertiser-banner"></div>
-`;
-
-    if (html.includes('</body>')) {
-      html = html.replace('</body>', `${banner}</body>`);
-    }
-
-    /* ===============================
+    /* =====================================
        4️⃣ HEADERS LIMPOS
-    =============================== */
+    ===================================== */
 
-    const headers = { ...origemRes.headers };
+    const headers = { ...playerRes.headers };
     delete headers['x-frame-options'];
     delete headers['content-security-policy'];
 
     res.writeHead(200, {
       ...headers,
-      'Content-Type': 'text/html; charset=utf-8',
-      'Access-Control-Allow-Origin': '*'
+      'Content-Type': playerRes.headers['content-type'] || 'text/html'
     });
 
     res.end(html);
+
   } catch (err) {
-    console.error('Erro proxy:', err);
-    res.status(500).end('Erro interno');
+    console.error('Erro geral:', err);
+    res.statusCode = 500;
+    res.end('Erro interno');
   }
 };
