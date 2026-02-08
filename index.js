@@ -3,7 +3,7 @@ const https = require('https');
 module.exports = async (req, res) => {
   try {
     const path = req.url;
-
+ 
     const BLOGSPOT_URL =
       'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
 
