@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
     const path = req.url === '/' ? '' : req.url;
 
     const BASE_URL =
-      'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
+      'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html?m=1';
 
     const targetUrl = BASE_URL + path;
 
