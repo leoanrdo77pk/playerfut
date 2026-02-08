@@ -1,8 +1,6 @@
 const https = require('https');
 
-const HOME_DOMAIN = 'puroplaynovo.blogspot.com';
-const HOME_PATH =
-  '/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
+const HOME_DOMAIN = 'puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
 
 const PLAYER_DOMAINS = ['rdcanais.top'];
 
