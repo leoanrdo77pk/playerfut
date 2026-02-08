@@ -1,9 +1,9 @@
 const https = require('https');
 
 /**
- * ORIGENS (ordem importa)
- * 0 = Blogspot (home)
- * 1 = rdcanais (player)
+ * ORIGENS
+ * 0 = Blogspot (HOME fixa com ?m=1)
+ * 1 = rdcanais (player dinâmico /{id})
  */
 const DOMINIOS = [
   'puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html?m=1',
@@ -31,23 +31,24 @@ module.exports = async (req, res) => {
 
     const reqHeaders = {
       'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-      'Referer': DOMINIOS[0]
+      'Referer': `https://${DOMINIOS[0]}`
     };
 
-    let fetched = null;
-    let dominioUsado = null;
+    let fetched;
+    let dominioUsado;
 
-    /* =============================
-       BLOGSPOT (HOME)
-    ============================= */
+    /* ============================
+       HOME → BLOGSPOT
+    ============================ */
     if (path === '') {
       const url = `https://${DOMINIOS[0]}`;
       fetched = await fetchUrl(url, reqHeaders);
       dominioUsado = DOMINIOS[0];
-    } else {
-      /* =============================
-         PLAYER (rdcanais/{id})
-      ============================= */
+    } 
+    /* ============================
+       PLAYER → RDCANAIS/{id}
+    ============================ */
+    else {
       const url = `https://${DOMINIOS[1]}${path}`;
       fetched = await fetchUrl(url, reqHeaders);
       dominioUsado = DOMINIOS[1];
@@ -55,11 +56,11 @@ module.exports = async (req, res) => {
 
     const { res: respOrig, data } = fetched;
 
-    /* =============================
+    /* ============================
        M3U8
-    ============================= */
+    ============================ */
     if (/\.m3u8$/i.test(path)) {
-      let playlist = data.replace(/(.*\.ts)/g, match => {
+      let playlist = data.replace(/(.*\.ts)/g, (match) => {
         if (match.startsWith('http')) {
           return match.replace(/https?:\/\/[^\/]+\//, '/');
         }
@@ -73,67 +74,84 @@ module.exports = async (req, res) => {
       return res.end(playlist);
     }
 
-    /* =============================
+    /* ============================
        ARQUIVOS ESTÁTICOS
-    ============================= */
+    ============================ */
     if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.test(path)) {
       const fileUrl =
         dominioUsado === DOMINIOS[0]
           ? `https://${DOMINIOS[0]}`
           : `https://${DOMINIOS[1]}${path}`;
 
-      https.get(fileUrl, { headers: reqHeaders }, streamResp => {
+      https.get(fileUrl, { headers: reqHeaders }, (streamResp) => {
         res.writeHead(streamResp.statusCode, streamResp.headers);
         streamResp.pipe(res);
       });
       return;
     }
 
-    /* =============================
+    /* ============================
        HTML
-    ============================= */
+    ============================ */
     if (respOrig.headers['content-type']?.includes('text/html')) {
       let html = data;
 
-      /* Remove headers de bloqueio */
       const headers = { ...respOrig.headers };
       delete headers['x-frame-options'];
       delete headers['content-security-policy'];
 
-      /* 🔥 REMOVE URL VISÍVEL DO BLOG */
-      html = html.replace(
-        /https?:\/\/puroplaynovo\.blogspot\.com\/2025\/06\/futebol-ao-vivo-gratis-reset-margin-0.html\?m=1/gi,
-        '/'
-      );
-
-      /* 🔥 REMOVE URL VISÍVEL DO RDCANAIS (QUALQUER ID) */
-      html = html.replace(
-        /https?:\/\/rdcanais\.top\/([^"'<>\\s]+)/gi,
-        '/$1'
-      );
-
-      /* src / href / action */
+      /* =================================================
+         🔹 REPLACES EXPLÍCITOS – BLOGSPOT
+      ================================================= */
       html = html
-        .replace(/src=["']https?:\/\/[^\/]+\/([^"']+)["']/gi, 'src="/$1"')
-        .replace(/href=["']https?:\/\/[^\/]+\/([^"']+)["']/gi, 'href="/$1"')
-        .replace(/action=["']https?:\/\/[^\/]+\/([^"']+)["']/gi, 'action="/$1"')
-        .replace(/url\(["']?https?:\/\/[^\/]+\/(.*?)["']?\)/gi, 'url("/$1")')
-        .replace(/<iframe([^>]*)src=["']https?:\/\/[^\/]+\/([^"']+)["']/gi, '<iframe$1src="/$2"')
-        .replace(/<base[^>]*>/gi, '');
+        .replace(
+          /href=["']https?:\/\/puroplaynovo\.blogspot\.com\/2025\/06\/futebol-ao-vivo-gratis-reset-margin-0.html\?m=1["']/gi,
+          'href="/"'
+        )
+        .replace(
+          /src=["']https?:\/\/puroplaynovo\.blogspot\.com\/2025\/06\/futebol-ao-vivo-gratis-reset-margin-0.html\?m=1["']/gi,
+          'src="/"'
+        );
 
-      /* Remove redirects JS */
-      html = html.replace(
-        /(window|document)\.location(\.href)?\s*=\s*['"][^'"]+['"]/gi,
-        ''
-      );
+      /* =================================================
+         🔹 REPLACES EXPLÍCITOS – RDCANAIS (QUALQUER {id})
+      ================================================= */
+      html = html
+        .replace(
+          /href=["']https?:\/\/rdcanais\.top\/([^"']+)["']/gi,
+          'href="/$1"'
+        )
+        .replace(
+          /src=["']https?:\/\/rdcanais\.top\/([^"']+)["']/gi,
+          'src="/$1"'
+        )
+        .replace(
+          /action=["']https?:\/\/rdcanais\.top\/([^"']+)["']/gi,
+          'action="/$1"'
+        )
+        .replace(
+          /url\(["']?https?:\/\/rdcanais\.top\/(.*?)["']?\)/gi,
+          'url("/$1")'
+        )
+        .replace(
+          /<iframe([^>]*)src=["']https?:\/\/rdcanais\.top\/([^"']+)["']/gi,
+          '<iframe$1src="/$2"'
+        );
 
-      /* Remove meta refresh */
-      html = html.replace(
-        /<meta[^>]+http-equiv=["']refresh["'][^>]*>/gi,
-        ''
-      );
+      /* =================================================
+         🔹 LIMPEZAS
+      ================================================= */
+      html = html
+        .replace(/<base[^>]*>/gi, '')
+        .replace(/<meta[^>]+http-equiv=["']refresh["'][^>]*>/gi, '')
+        .replace(
+          /(window|document)\.location(\.href)?\s*=\s*['"][^'"]+['"]/gi,
+          ''
+        );
 
-      /* ===== ESPAÇO PARA SEU BANNER ===== */
+      /* =================================================
+         🔹 ESPAÇO PARA BANNER
+      ================================================= */
       html = html.replace(
         '</body>',
         `
@@ -151,7 +169,7 @@ module.exports = async (req, res) => {
       return res.end(html);
     }
 
-    /* Outros */
+    /* Outros tipos */
     res.writeHead(respOrig.statusCode, respOrig.headers);
     res.end(data);
 
