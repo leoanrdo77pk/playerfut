@@ -2,16 +2,28 @@ const https = require('https');
 
 module.exports = async (req, res) => {
   try {
-    const path = req.url;
- 
+    const path = req.url.replace(/\?.*$/, '');
+
     const BLOGSPOT_URL =
       'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
 
     let targetUrl;
 
+    // ==========================
+    // DEFINIÇÃO DE ROTAS
+    // ==========================
     if (path === '/' || path === '') {
       targetUrl = BLOGSPOT_URL;
-    } else {
+    }
+
+    // /rdcanais.top/espn/
+    else if (path.startsWith('/rdcanais.top/')) {
+      targetUrl =
+        'https://rdcanais.top/' + path.replace('/rdcanais.top/', '');
+    }
+
+    // /espn  → força como player
+    else {
       targetUrl = 'https://rdcanais.top' + path;
     }
 
@@ -31,22 +43,25 @@ module.exports = async (req, res) => {
 
         resp.on('end', () => {
           try {
+            // ==========================
+            // HEADERS
+            // ==========================
             const headers = { ...resp.headers };
             delete headers['x-frame-options'];
             delete headers['content-security-policy'];
             delete headers['content-length'];
 
             // ==========================
-            // REWRITE LINKS
+            // REWRITE HTML
             // ==========================
             data = data
-              // Blogspot → relativo
+              // blogspot → relativo
               .replace(
                 /https:\/\/puroplaynovo\.blogspot\.com\/[^"'\s<>]+/gi,
                 (m) => new URL(m).pathname
               )
 
-              // rdcanais → relativo
+              // rdcanais.top → relativo
               .replace(
                 /https?:\/\/(?:www\.)?rdcanais\.top\/([^"'>\s]+)/gi,
                 '/$1'
@@ -64,7 +79,7 @@ module.exports = async (req, res) => {
                 ''
               )
 
-              // remover base
+              // remover <base>
               .replace(/<base[^>]*>/gi, '');
 
             // ==========================
