@@ -1,64 +1,76 @@
 const https = require('https');
 
-module.exports = async (req, res) => {
-  try {
-    const path = req.url.replace(/\?.*$/, '');
+const PLAYER_BASE = 'https://www2.embedtv.best';
 
-    if (!path || path === '/') {
+// lista de canais aceitos
+const CANAIS = [
+  'espn',
+  'premiere',
+  'sportv',
+  'combate',
+  'ufc',
+  'tnt',
+  'bandsports'
+];
+
+module.exports = (req, res) => {
+  try {
+    let path = req.url.split('?')[0];
+    path = path.replace(/^\/+/, '').toLowerCase();
+
+    // ignora favicon
+    if (!path || path === 'favicon.ico') {
       res.statusCode = 404;
       return res.end('Canal não informado');
     }
 
-    // /premiere → premiere
-    const canal = path.replace(/^\/+/, '');
+    // valida canal
+    if (!CANAIS.includes(path)) {
+      res.statusCode = 404;
+      return res.end('Canal inválido');
+    }
 
-    const targetUrl = `https://www6.redecanaistv.in/ao-vivo/${canal}/`;
+    const targetUrl = `${PLAYER_BASE}/${path}`;
 
-    https.get(
-      targetUrl,
-      {
-        headers: {
-          'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-          'Referer': 'https://www6.redecanaistv.in/',
-        },
-      },
-      (resp) => {
-        let data = '';
+    const headers = {
+      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+      'Referer': PLAYER_BASE,
+      'Origin': PLAYER_BASE
+    };
 
-        resp.setEncoding('utf8');
-        resp.on('data', chunk => (data += chunk));
+    https.get(targetUrl, { headers }, (resp) => {
+      let html = '';
 
-        resp.on('end', () => {
-          try {
-            data = data
-              // remove domínio absoluto
-              .replace(/https?:\/\/www6\.redecanaistv\.in/gi, '')
-              // remove redirects JS
-              .replace(/window\.location[^;]+;/gi, '')
-              // remove meta refresh
-              .replace(/<meta[^>]+http-equiv=["']refresh["'][^>]*>/gi, '')
-              // remove base
-              .replace(/<base[^>]*>/gi, '');
+      resp.setEncoding('utf8');
+      resp.on('data', chunk => (html += chunk));
 
-            res.writeHead(200, {
-              'Content-Type':
-                resp.headers['content-type'] || 'text/html; charset=utf-8',
-              'Access-Control-Allow-Origin': '*',
-            });
+      resp.on('end', () => {
+        // remove proteções básicas
+        res.removeHeader('X-Frame-Options');
+        res.removeHeader('Content-Security-Policy');
 
-            res.end(data);
-          } catch (e) {
-            console.error(e);
-            res.statusCode = 500;
-            res.end('Erro ao processar player');
-          }
+        // reescreve links absolutos → relativos
+        html = html
+          .replace(/https?:\/\/www2\.embedtv\.best/gi, '')
+          .replace(/https?:\/\/embedtv\.best/gi, '')
+          .replace(/href="\//gi, 'href="/')
+          .replace(/src="\//gi, 'src="/');
+
+        res.writeHead(200, {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Access-Control-Allow-Origin': '*'
         });
-      }
-    ).on('error', () => {
+
+        res.end(html);
+      });
+    }).on('error', (err) => {
+      console.error('Erro proxy:', err);
       res.statusCode = 500;
-      res.end('Erro ao carregar o player');
+      res.end('Erro ao carregar player');
     });
+
   } catch (err) {
+    console.error('Erro geral:', err);
     res.statusCode = 500;
     res.end('Erro interno');
   }
