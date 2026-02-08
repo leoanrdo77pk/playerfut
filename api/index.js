@@ -1,68 +1,65 @@
-const https = require("https");
-
-const DOMINIOS = [
-  "rdcanais.top",
-  "streamrdc.xyz",
-  "rdcanais.live",
-  "rdcanais.vip"
-];
-
-// Mapeia o slug para a página real do player
-function montarUrl(slug) {
-  return `https://rdcanais.top/${slug}`;
-}
-
-function fetchPage(url) {
-  return new Promise((resolve, reject) => {
-    https.get(
-      url,
-      {
-        headers: {
-          "User-Agent": "Mozilla/5.0",
-          "Referer": "https://rdcanais.top/",
-          "Accept": "text/html"
-        }
-      },
-      (res) => {
-        let data = "";
-
-        res.on("data", chunk => data += chunk);
-        res.on("end", () => resolve(data));
-      }
-    ).on("error", reject);
-  });
-}
+const https = require('https');
 
 module.exports = async (req, res) => {
   try {
-    // remove a /
-    const slug = req.url.replace("/", "");
+    const path = req.url.replace(/\?.*$/, '');
 
-    if (!slug) {
-      res.status(400).send("Canal não informado");
-      return;
+    if (!path || path === '/') {
+      res.statusCode = 404;
+      return res.end('Canal não informado');
     }
 
-    const url = montarUrl(slug);
-    let html = await fetchPage(url);
+    // /premiere → premiere
+    const canal = path.replace(/^\/+/, '');
 
-    // 🔥 Corrige TODOS os links internos
-    DOMINIOS.forEach(dominio => {
-      const rgx = new RegExp(`https?:\/\/${dominio}`, "gi");
-      html = html.replace(rgx, "https://playerfut.vercel.app");
+    const targetUrl = `https://www6.redecanaistv.in/ao-vivo/${canal}/`;
+
+    https.get(
+      targetUrl,
+      {
+        headers: {
+          'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+          'Referer': 'https://www6.redecanaistv.in/',
+        },
+      },
+      (resp) => {
+        let data = '';
+
+        resp.setEncoding('utf8');
+        resp.on('data', chunk => (data += chunk));
+
+        resp.on('end', () => {
+          try {
+            data = data
+              // remove domínio absoluto
+              .replace(/https?:\/\/www6\.redecanaistv\.in/gi, '')
+              // remove redirects JS
+              .replace(/window\.location[^;]+;/gi, '')
+              // remove meta refresh
+              .replace(/<meta[^>]+http-equiv=["']refresh["'][^>]*>/gi, '')
+              // remove base
+              .replace(/<base[^>]*>/gi, '');
+
+            res.writeHead(200, {
+              'Content-Type':
+                resp.headers['content-type'] || 'text/html; charset=utf-8',
+              'Access-Control-Allow-Origin': '*',
+            });
+
+            res.end(data);
+          } catch (e) {
+            console.error(e);
+            res.statusCode = 500;
+            res.end('Erro ao processar player');
+          }
+        });
+      }
+    ).on('error', () => {
+      res.statusCode = 500;
+      res.end('Erro ao carregar o player');
     });
-
-    // remove proteções comuns
-    html = html
-      .replace(/X-Frame-Options/gi, "")
-      .replace(/Content-Security-Policy/gi, "");
-
-    res.setHeader("Content-Type", "text/html; charset=utf-8");
-    res.setHeader("Access-Control-Allow-Origin", "*");
-
-    res.status(200).send(html);
-
   } catch (err) {
-    res.status(500).send("Erro ao carregar o player");
+    res.statusCode = 500;
+    res.end('Erro interno');
   }
 };
