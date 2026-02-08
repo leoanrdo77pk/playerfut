@@ -2,19 +2,30 @@ const https = require('https');
 
 module.exports = async (req, res) => {
   try {
-    const path = req.url === '/' ? '' : req.url;
+    const path = req.url;
 
-    const BASE_URL =
+    const BLOGSPOT_URL =
       'https://puroplaynovo.blogspot.com/2025/06/futebol-ao-vivo-gratis-reset-margin-0.html';
 
-    const targetUrl = BASE_URL + path;
+    // ==========================
+    // DEFINIR DESTINO DINÂMICO
+    // ==========================
+    let targetUrl;
+
+    if (path === '/' || path === '') {
+      // Página principal
+      targetUrl = BLOGSPOT_URL;
+    } else {
+      // Qualquer canal → rdcanais.top
+      targetUrl = 'https://rdcanais.top' + path;
+    }
 
     https.get(
       targetUrl,
       {
         headers: {
           'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-          'Referer': BASE_URL,
+          'Referer': targetUrl,
         },
       },
       (resp) => {
@@ -36,16 +47,13 @@ module.exports = async (req, res) => {
             // REWRITE HTML
             // ==========================
             data = data
-              // Blogspot absoluto → relativo
+              // blogspot → relativo
               .replace(
                 /https:\/\/puroplaynovo\.blogspot\.com\/[^"'\s<>]+/gi,
-                (match) => {
-                  const url = new URL(match);
-                  return url.pathname;
-                }
+                (match) => new URL(match).pathname
               )
 
-              // rdcanais.top (qualquer canal) → proxy interno
+              // rdcanais.top → relativo
               .replace(
                 /https?:\/\/(?:www\.)?rdcanais\.top\/([^"'>\s]+)/gi,
                 '/$1'
@@ -63,57 +71,27 @@ module.exports = async (req, res) => {
                 ''
               )
 
-              // remover <base>
+              // remover base
               .replace(/<base[^>]*>/gi, '');
 
             // ==========================
-            // HEAD (SEO / META)
+            // HEAD
             // ==========================
             data = data
               .replace(
                 /<title>[\s\S]*?<\/title>/i,
                 '<title>Futebol Ao Vivo</title>'
               )
-              .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
-              .replace(
-                /<head>/i,
-                `<head>
-<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`
-              );
+              .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '');
 
             // ==========================
-            // REMOVER TODOS OS SCRIPTS ORIGINAIS
+            // REMOVER SCRIPTS
             // ==========================
             data = data.replace(
               /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
               ''
             );
 
-            // ==========================
-            // BANNER
-            // ==========================
-            const banner = `
-<div id="custom-footer">
-<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
-<script>
-mnpw.add(
-  'https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9',
-  {
-    newTab: true,
-    cookieExpires: 86401
-  }
-);
-</script>
-</div>
-`;
-
-            const finalHtml = data.includes('</body>')
-              ? data.replace('</body>', banner + '\n</body>')
-              : data + banner;
-
-            // ==========================
-            // RESPONSE
-            // ==========================
             res.writeHead(200, {
               ...headers,
               'Access-Control-Allow-Origin': '*',
@@ -121,11 +99,11 @@ mnpw.add(
                 resp.headers['content-type'] || 'text/html; charset=utf-8',
             });
 
-            res.end(finalHtml);
+            res.end(data);
           } catch (err) {
             console.error('Erro ao processar HTML:', err);
             res.statusCode = 500;
-            res.end('Erro ao processar o conteúdo.');
+            res.end('Erro ao processar conteúdo.');
           }
         });
       }
