@@ -19,40 +19,30 @@ module.exports = (req, res) => {
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Assistir ${canal.toUpperCase()} Ao Vivo</title>
-
-<meta name="viewport" content="
-  width=device-width,
-  height=device-height,
-  initial-scale=1,
-  maximum-scale=1,
-  user-scalable=no
-">
-
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  html, body {
-    width: 100%;
-    height: 100%;
-    background: #000;
-    overflow: hidden;
-  }
-
-  iframe {
-    width: 100vw;
-    height: 50vh;
-    border: none;
-    display: block;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Assistir ${canal.toUpperCase()} Ao Vivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+    }
+    iframe {
+      width: 100%;
+      height: 40%;
+      border: none;
+    }
+  </style>
 </head>
-
+<body>
+  <iframe 
+    src="${playerUrl}" 
+    allowfullscreen 
+    allow="autoplay; encrypted-media">
+  </iframe>
+</body>
 </html>
     `);
 
