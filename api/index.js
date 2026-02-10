@@ -19,68 +19,79 @@ module.exports = (req, res) => {
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Assistir ${canal.toUpperCase()} Ao Vivo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
+<title>Assistir ${canal.toUpperCase()} Ao Vivo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    #playerWrapper {
-      width: 100%;
-      height: 100%;
-    }
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+  }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
 
-    /* dica visual só no mobile */
-    #rotateHint {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,.6);
-      color: #fff;
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 6px;
-      z-index: 9999;
-    }
-  </style>
+  #tapLayer {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.01);
+  }
+
+  #hint {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,.7);
+    color: #fff;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    z-index: 10000;
+  }
+</style>
 </head>
+
 <body>
 
-<div id="rotateHint">🔄 Gire o celular</div>
+<div id="tapLayer"></div>
+<div id="hint">Toque para tela cheia</div>
 
-<div id="playerWrapper">
-  <iframe 
-    id="playerFrame"
-    src="${playerUrl}" 
-    allowfullscreen
-    allow="autoplay; encrypted-media; fullscreen; picture-in-picture">
-  </iframe>
-</div>
+<iframe 
+  id="player"
+  src="${playerUrl}"
+  allowfullscreen
+  allow="autoplay; encrypted-media; fullscreen; picture-in-picture">
+</iframe>
 
 <script>
   const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
 
+  function requestFS() {
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else if (el.msRequestFullscreen) el.msRequestFullscreen();
+  }
+
   if (isMobile) {
-    document.body.addEventListener('click', () => {
-      const elem = document.documentElement;
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-      }
+    // tentativa automática
+    setTimeout(requestFS, 500);
+
+    // fallback no primeiro toque
+    document.getElementById('tapLayer').addEventListener('click', () => {
+      requestFS();
+      document.getElementById('tapLayer').remove();
+      document.getElementById('hint').remove();
     }, { once: true });
   }
 </script>
