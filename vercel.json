@@ -2,7 +2,7 @@
   "version": 2,
   "routes": [
     {
-      "src": "/(espn1|premiere|sportv1|combate|ufc|tnt|bandsports|globomg|globosp|glpborj|globonordeste|bbb-1|bbb-2|bbb-3|cazetv1|cazetv2|cazetv3|dazn1|dazn2|dazn3|dazn4)",
+      "src": "/(espn1|premiere|sportv1|combate|ufc|tnt|bandsports|globomg|globosp|glpborj|globonordeste|bbb26-1|bbb26-2|bbb26-3|cazetv1|cazetv2|cazetv3|dazn1|dazn2|dazn3|dazn4)",
       "dest": "/api/index.js"
     }
   ]
