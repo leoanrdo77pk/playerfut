@@ -30,8 +30,8 @@ module.exports = (req, res) => {
       background: #000;
     }
     iframe {
-      width: 70%;
-      height: 70%;
+      width: 100%;
+      height: 100%;
       border: none;
     }
   </style>
