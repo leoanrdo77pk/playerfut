@@ -20,7 +20,7 @@ module.exports = (req, res) => {
 <head>
 <meta charset="UTF-8">
 <title>Assistir ${canal.toUpperCase()} Ao Vivo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 * {
@@ -29,38 +29,48 @@ module.exports = (req, res) => {
   box-sizing: border-box;
 }
 
-html, body {
-  width: 100%;
-  height: 100%;
+body {
   background: #000;
-  overflow: hidden;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  padding: 16px;
 }
 
+/* Container do player */
+.player-container {
+  width: 100%;
+  max-width: 900px; /* desktop */
+}
+
+/* Proporção 16:9 */
 .player-wrapper {
-  position: fixed;
-  inset: 0;
+  position: relative;
   width: 100%;
-  height: 100svh; /* mobile-safe height */
+  aspect-ratio: 16 / 9;
   background: #000;
 }
 
-iframe {
+/* iframe ocupa só o wrapper */
+.player-wrapper iframe {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   border: 0;
-  display: block;
 }
 </style>
 </head>
 
 <body>
-  <div class="player-wrapper">
-    <iframe
-      src="${playerUrl}"
-      allow="autoplay; encrypted-media; fullscreen"
-      allowfullscreen
-      scrolling="no">
-    </iframe>
+  <div class="player-container">
+    <div class="player-wrapper">
+      <iframe
+        src="${playerUrl}"
+        allow="autoplay; encrypted-media; fullscreen"
+        allowfullscreen>
+      </iframe>
+    </div>
   </div>
 </body>
 </html>`);
