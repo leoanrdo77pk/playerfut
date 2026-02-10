@@ -53,13 +53,6 @@ module.exports = (req, res) => {
 </style>
 </head>
 
-<body>
-  <iframe
-    src="${playerUrl}"
-    allowfullscreen
-    allow="autoplay; encrypted-media; fullscreen; picture-in-picture">
-  </iframe>
-</body>
 </html>
     `);
 
