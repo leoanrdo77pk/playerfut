@@ -15,65 +15,37 @@ module.exports = (req, res) => {
       'Cache-Control': 'no-store'
     });
 
-    res.end(`<!DOCTYPE html>
+    res.end(`
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Assistir ${canal.toUpperCase()} Ao Vivo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: #000;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  padding: 16px;
-}
-
-/* Container do player */
-.player-container {
-  width: 100%;
-  max-width: 900px; /* desktop */
-}
-
-/* Proporção 16:9 */
-.player-wrapper {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: #000;
-}
-
-/* iframe ocupa só o wrapper */
-.player-wrapper iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Assistir ${canal.toUpperCase()} Ao Vivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
 </head>
-
 <body>
-  <div class="player-container">
-    <div class="player-wrapper">
-      <iframe
-        src="${playerUrl}"
-        allow="autoplay; encrypted-media; fullscreen"
-        allowfullscreen>
-      </iframe>
-    </div>
-  </div>
+  <iframe 
+    src="${playerUrl}" 
+    allowfullscreen 
+    allow="autoplay; encrypted-media">
+  </iframe>
 </body>
-</html>`);
+</html>
+    `);
+
   } catch (err) {
     console.error(err);
     res.writeHead(500, { 'Content-Type': 'text/plain' });
