@@ -230,26 +230,565 @@
         color: #333};
       }
     </style>
-  </head>
+    
+     <style>
+      /* Reset */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f8f8f8;
+          color: #333;
+          transition: background-color 03s, color 03s;
+      }
+
+      body.dark-mode {
+          background-color: #222;
+          color: #ddd;
+      }
+
+      header {
+          background: linear-gradient(135deg, #1c1c1c, #1c1c1c);
+          padding: 20px;
+          text-align: center;
+          position: relative;
+      }
+
+      header h1 {
+          font-size: 2rem;
+          color: #fff;
+          margin-bottom: 10px;
+      }
+
+      header .sub-title {
+          font-size: 1rem;
+          color: #e0e0e0;
+      }
+
+      .search-container {
+          margin: 20px auto;
+          max-width: 600px;
+          text-align: center;
+      }
+
+      .search-container form {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+      }
+
+      .search-container input[type="text"] {
+          width: 70%;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 1rem;
+      }
+
+      .search-container input[type="submit"] {
+          padding: 10px 20px;
+          border: none;
+          background: #757575;
+          color: #fff;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 1rem;
+      }
+
+      .search-container input[type="submit"]:hover {
+          background: #616161;
+      }
+
+      .refresh-container {
+          text-align: center;
+          margin: 20px 0;
+      }
+
+      .refresh-btn {
+          background-color: #009687;
+          color: #fff;
+          border: none;
+          padding: 10px 20px;
+          font-size: 16px;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 03s;
+      }
+
+      .refresh-btn:hover {
+          background-color: #cecece;
+      }
+
+      .games-container {
+          max-width: 1200px;
+          margin: 20px auto;
+          padding: 0 20px;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 20px;
+      }
+
+      .game-card {
+          background: #fff;
+          border-radius: 8px;
+          box-shadow: 0 2px 6px rgba(0,0,0,01);
+          overflow: hidden;
+          transition: transform 03s;
+      }
+
+      body.dark-mode .game-card {
+          background: #333;
+          box-shadow: 0 2px 6px rgba(0,0,0,05);
+      }
+
+      .game-card:hover {
+          transform: translateY(-5px);
+      }
+
+      .game-card header {
+          background: #f1f1f1;
+          padding: 10px;
+          text-align: center;
+          font-weight: bold;
+          font-size: 1.1rem;
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+      }
+
+      body.dark-mode .game-card header {
+          background: #444;
+      }
+
+      .game-card header .team {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+      }
+
+      .game-card header .team img {
+          width: 50px;
+          height: 50px;
+          object-fit: cover;
+          border-radius: 4px;
+          margin-bottom: 5px;
+      }
+
+      .game-card .info {
+          padding: 15px;
+          text-align: center;
+      }
+
+      .game-card .info .competition {
+          font-size: 09rem;
+          color: #777;
+          margin-bottom: 5px;
+      }
+
+      body.dark-mode .game-card .info .campeonato {
+          color: #bbb;
+      }
+
+      .game-card .info .horario {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+body.dark-mode .game-card .info .horario {
+    color: #eee;
+}
+
+
+      .game-card footer {
+          text-align: center;
+          padding: 10px;
+          background: #2b2b31;
+      }
+
+      .game-card footer a {
+          text-decoration: none;
+          color: #009688;
+          font-weight: bold;
+          display: block;
+      }
+
+      .load-more {
+          text-align: center;
+          margin: 30px 0;
+      }
+
+      .load-more a {
+          display: inline-block;
+          padding: 10px 20px;
+          background: #757575;
+          color: #fff;
+          border-radius: 4px;
+          text-decoration: none;
+          font-weight: bold;
+          transition: background 03s;
+      }
+
+      .load-more a:hover {
+          background: #616161;
+      }
+
+      footer.site-footer {
+          background: #222;
+          color: #ccc;
+          text-align: center;
+          padding: 15px;
+          margin-top: 40px;
+      }
+
+      footer.site-footer a {
+          color: #fff;
+          text-decoration: none;
+          font-weight: bold;
+      }
+
+      .back-to-top {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background-color: #000;
+          color: white;
+          padding: 10px 20px;
+          border-radius: 5px;
+          font-size: 1rem;
+          cursor: pointer;
+          display: none;
+      }
+
+      .back-to-top:hover {
+          background-color: #239621;
+      }
+    </style>
+
+     </head>
+  
+  
+    </head>
+  <body>
+    <!-- Cabeçalho -->
+    <header>
+      <div class="match-title">
+        <h1>JOGOS DE HOJE - 06/06/2025</h1>
+        <p class="sub-title">Encontre todos os jogos em um só lugar</p>
+        <p class="sub-title">Futebol ao vivo grátis</p>
+      </div>
+    </header>
+
+    <!-- Barra de Pesquisa -->
+    <div class="search-container">
+      <form action="" method="get" id="searchForm">
+        <input
+          type="text"
+          name="search"
+          placeholder="Pesquisar por time ou campeonato"
+          value=""
+        />
+        <input type="submit" value="Buscar" />
+      </form>
+    </div>
+
+    <!-- Botão Atualizar Jogos integrado ao layout -->
+    <div class="refresh-container">
+      <button id="refreshButton" class="refresh-btn">Atualizar Jogos</button>
+    </div>
+
+<!-- Brasileiro Série B - Cuiabá vs Paysandu -->
+<div class="games-container" id="gamesContainer">
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/liverpool.png" alt="Liverpool">
+                <span>Liverpool</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/manchester-city.png" alt="Manchester City">
+                <span>Manchester City</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Ingles</div>
+            <div class="horario">13:30</div>
+        </div>
+        <footer>
+            <a href="/espn1">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/bayern-de-munique.png" alt="Bayern">
+                <span>Bayern</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/hoffenheim.png" alt="Hoffenheim">
+                <span>Hoffenheim</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Alemão</div>
+            <div class="horario">13:30</div>
+        </div>
+        <footer>
+            <a href="/sportv1">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/juazeirense.png" alt="Juazeirense">
+                <span>Juazeirense</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/bahia.png" alt="Bahia">
+                <span>Bahia</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Baiano</div>
+            <div class="horario">16:00</div>
+        </div>
+        <footer>
+            <a href="/sportv2">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/noroeste.png" alt="Noroeste">
+                <span>Noroeste</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/santos.png" alt="Santos">
+                <span>Santos</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Paulista</div>
+            <div class="horario">16:00</div>
+        </div>
+        <footer>
+            <a href="/espn4">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/juventus.png" alt="Juventus">
+                <span>Juventus</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/lazio.png" alt="Lazio">
+                <span>Lazio</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Italiano</div>
+            <div class="horario">16:45</div>
+        </div>
+        <footer>
+            <a href="/globorj">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/psg.png" alt="PSG">
+                <span>PSG</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/olympique.png" alt="Olympique">
+                <span>Olympique</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Francês</div>
+            <div class="horario">16:45</div>
+        </div>
+        <footer>
+            <a href="/tnt">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/valencia.png" alt="Valencia">
+                <span>Valencia</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/real-madrid.png" alt="Real Madrid">
+                <span>Real Madrid</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Espanhol</div>
+            <div class="horario">17:00</div>
+        </div>
+        <footer>
+            <a href="/espn">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/ceara.png" alt="Ceará">
+                <span>Ceará</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/bahia.png" alt="Fortaleza">
+                <span>Fortaleza</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Cearense</div>
+            <div class="horario">18:00</div>
+        </div>
+        <footer>
+            <a href="https://futebol7k.com/jogo.php?id=12974">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/cruzeiro.png" alt="Cruzeiro">
+                <span>Cruzeiro</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/america-mg.png" alt="América-MG">
+                <span>América-MG</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Mineiro</div>
+            <div class="horario">18:00</div>
+        </div>
+        <footer>
+            <a href="https://futebol7k.com/jogo.php?id=12975">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/vasco.png" alt="Vasco">
+                <span>Vasco</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/botafogo.png" alt="Botafogo">
+                <span>Botafogo</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Carioca</div>
+            <div class="horario">18:00</div>
+        </div>
+        <footer>
+            <a href="https://futebol7k.com/jogo.php?id=12976">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/internacional.png" alt="Internacional">
+                <span>Internacional</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/sao-luiz.png" alt="São Luiz">
+                <span>São Luiz</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Gaucho</div>
+            <div class="horario">18:00</div>
+        </div>
+        <footer>
+            <a href="https://futebol7k.com/jogo.php?id=12977">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/corinthians.png" alt="Corinthians">
+                <span>Corinthians</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/palmeiras.png" alt="Palmeiras">
+                <span>Palmeiras</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Paulista</div>
+            <div class="horario">20:30</div>
+        </div>
+        <footer>
+            <a href="https://futebol7k.com/jogo.php?id=12978">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/fluminense.png" alt="Fluminense">
+                <span>Fluminense</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/sem-logo.png" alt="Marica">
+                <span>Marica</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Carioca</div>
+            <div class="horario">20:30</div>
+        </div>
+        <footer>
+            <a href="https://futebol7k.com/jogo.php?id=12979">Assistir</a>
+        </footer>
+    </div>
+    </div>
 
 
 
-<!-- Begin BidVertiser code -->
-<SCRIPT data-cfasync="false" SRC="//bdv.bidvertiser.com/BidVertiser.dbm?pid=921830&bid=2101686&fid=2101686" TYPE="text/javascript"></SCRIPT>
-<!-- End BidVertiser code -->
+ 
+
+<!-- Botão Voltar ao Topo -->
+<div class="back-to-top" id="backToTop">↑ Topo</div>
 
 
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.querySelector('input[name="search"]');
+    const cards = document.querySelectorAll('.game-card');
 
-	
+    input.addEventListener('input', function () {
+      const termo = input.value.toLowerCase();
+
+      cards.forEach(card => {
+        const texto = card.innerText.toLowerCase();
+        if (texto.includes(termo)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+  
+  
+  
+  
+  
   <body class="bg-gray-900 text-white font-sans min-h-screen flex flex-col">
-
-<div class="space-y-4">
+   
+      <div class="space-y-4">
         <h2
           class="text-lg font-semibold text-gray-300 mb-4 flex items-center gap-2"
         >
           <div class="w-1 h-6 bg-blue-500 rounded-full"></div>
-         Canais Plus
+          Lista de Canais
         </h2>
 
         <div
@@ -319,7 +858,7 @@
               <p class="channel-name group-hover">BBB26 - Câmera Principal</p>
               <p class="channel-status">Clique para assistir</p>
             </div></a
-          ><a href="/bbb26-2" class="channel-button group">
+          ><a href="/bbb-2" class="channel-button group">
             <div class="channel-img-container">
               <img
                 src="https://sinalpublico.vercel.app/imgs/playicon.png"
@@ -1962,46 +2501,11 @@
 
 
 
-
-
-<div id="ntv_2103671"></div>
-<script type="text/javascript">
-(function(d) {
-	var params =
-	{
-		bvwidgetid: "ntv_2103671",
-		bvlinksownid: 2103671,
-		rows: 1,
-		cols: 2,
-		textpos: "below",
-		imagewidth: 150,
-		mobilecols: 2,
-		cb: (new Date()).getTime()
-	};
-	params.bvwidgetid = "ntv_2103671" + params.cb;
-	d.getElementById("ntv_2103671").id = params.bvwidgetid;
-	var qs = Object.keys(params).reduce(function(a, k){ a.push(k + '=' + encodeURIComponent(params[k])); return a},[]).join(String.fromCharCode(38));
-	var s = d.createElement('script'); s.type='text/javascript';s.async=true;
-	var p = 'https:' == document.location.protocol ? 'https' : 'http';
-	s.src = p + "://cdn.hyperpromote.com/bidvertiser/tags/active/bdvws.js?" + qs;
-	d.getElementById(params.bvwidgetid).appendChild(s);
-})(document);
-</script>
-
-
-
-
-
-
-
-	  
-
     <footer class="bg-gray-800">
       <div class="container mx-auto text-center text-gray-500 text-sm py-4">
         Canais Plus
       </div>
     </footer>
-	  
 
     <div id="alert" class="alert-box">
       <i class="fas fa-check-circle text-lg"></i>
