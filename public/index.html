@@ -231,239 +231,113 @@
       }
     </style>
     
-     <style>
-      /* Reset */
-      * { margin: 0; padding: 0; box-sizing: border-box; }
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
 
-      body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background-color: #f8f8f8;
-          color: #333;
-          transition: background-color 03s, color 03s;
-      }
-
-      body.dark-mode {
-          background-color: #222;
-          color: #ddd;
-      }
-
-      header {
-          background: linear-gradient(135deg, #1c1c1c, #1c1c1c);
-          padding: 20px;
-          text-align: center;
-          position: relative;
-      }
-
-      header h1 {
-          font-size: 2rem;
-          color: #fff;
-          margin-bottom: 10px;
-      }
-
-      header .sub-title {
-          font-size: 1rem;
-          color: #fff;
-      }
-
-      .search-container {
-          margin: 20px auto;
-          max-width: 600px;
-          text-align: center;
-      }
-
-      .search-container form {
-          display: flex;
-          justify-content: center;
-          gap: 10px;
-      }
-
-      .search-container input[type="text"] {
-          width: 70%;
-          padding: 10px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          font-size: 1rem;
-      }
-
-      .search-container input[type="submit"] {
-          padding: 10px 20px;
-          border: none;
-          background: #757575;
-          color: #fff;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 1rem;
-      }
-
-      .search-container input[type="submit"]:hover {
-          background: #616161;
-      }
-
-      .refresh-container {
-          text-align: center;
-          margin: 20px 0;
-      }
-
-      .refresh-btn {
-          background-color: #009687;
-          color: #fff;
-          border: none;
-          padding: 10px 20px;
-          font-size: 16px;
-          border-radius: 5px;
-          cursor: pointer;
-          transition: background-color 03s;
-      }
-
-      .refresh-btn:hover {
-          background-color: #cecece;
-      }
-
-      .games-container {
-          max-width: 1200px;
-          margin: 20px auto;
-          padding: 0 20px;
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 4fr));
-          gap: 20px;
-      }
-
-      .game-card {
-          background: #000000;
-          border-radius: 8px;
-          box-shadow: 0 2px 6px rgba(0,0,0,01);
-          overflow: hidden;
-          transition: transform 03s;
-      }
-
-      body.dark-mode .game-card {
-          background: #333;
-          box-shadow: 0 2px 6px rgba(0,0,0,05);
-      }
-
-      .game-card:hover {
-          transform: translateY(-5px);
-      }
-
-      .game-card header {
-          background: #000000;
-          padding: 10px;
-          text-align: center;
-          font-weight: bold;
-          font-size: 1.1rem;
-          display: flex;
-          justify-content: space-around;
-          align-items: center;
-      }
-
-      body.dark-mode .game-card header {
-          background: #444;
-      }
-
-      .game-card header .team {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-      }
-
-      .game-card header .team img {
-          width: 50px;
-          height: 50px;
-          object-fit: cover;
-          border-radius: 4px;
-          margin-bottom: 5px;
-      }
-
-      .game-card .info {
-          padding: 15px;
-          text-align: center;
-      }
-
-      .game-card .info .competition {
-          font-size: 09rem;
-          color: #777;
-          margin-bottom: 5px;
-      }
-
-      body.dark-mode .game-card .info .campeonato {
-          color: #000;
-      }
-
-      .game-card .info .horario {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #333;
+body{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background:#f8f8f8;
 }
 
-body.dark-mode .game-card .info .horario {
-    color: #eee;
+/* HEADER */
+header{
+    background:#111;
+    padding:20px;
+    text-align:center;
+    color:#fff;
 }
 
+header h1{
+    font-size:1.6rem;
+}
 
-      .game-card footer {
-          text-align: center;
-          padding: 10px;
-          background: #2b2b31;
-      }
+/* SLIDER CONTAINER */
+.games-container{
+    display:flex;
+    overflow-x:auto;
+    scroll-behavior:smooth;
+    gap:15px;
+    padding:20px;
+}
 
-      .game-card footer a {
-          text-decoration: none;
-          color: #009688;
-          font-weight: bold;
-          display: block;
-      }
+.games-container::-webkit-scrollbar{
+    display:none;
+}
 
-      .load-more {
-          text-align: center;
-          margin: 30px 0;
-      }
+/* CARD */
+.game-card{
+    min-width:220px;
+    max-width:220px;
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    flex-shrink:0;
+    transition:transform .3s;
+}
 
-      .load-more a {
-          display: inline-block;
-          padding: 10px 20px;
-          background: #757575;
-          color: #fff;
-          border-radius: 4px;
-          text-decoration: none;
-          font-weight: bold;
-          transition: background 03s;
-      }
+.game-card:hover{
+    transform:scale(1.03);
+}
 
-      .load-more a:hover {
-          background: #616161;
-      }
+.game-card header{
+    display:flex;
+    justify-content:space-between;
+    padding:10px;
+    background:#f1f1f1;
+}
 
-      footer.site-footer {
-          background: #222;
-          color: #ccc;
-          text-align: center;
-          padding: 15px;
-          margin-top: 40px;
-      }
+.team{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    font-size:0.8rem;
+}
 
-      footer.site-footer a {
-          color: #fff;
-          text-decoration: none;
-          font-weight: bold;
-      }
+.team img{
+    width:40px;
+    height:40px;
+    margin-bottom:5px;
+}
 
-      .back-to-top {
-          position: fixed;
-          bottom: 20px;
-          right: 20px;
-          background-color: #000;
-          color: white;
-          padding: 10px 20px;
-          border-radius: 5px;
-          font-size: 1rem;
-          cursor: pointer;
-          display: none;
-      }
+.info{
+    padding:10px;
+    text-align:center;
+}
 
-      .back-to-top:hover {
-          background-color: #239621;
-      }
-    </style>
+.campeonato{
+    font-size:0.8rem;
+    color:#777;
+}
+
+.horario{
+    font-weight:bold;
+    font-size:1rem;
+    margin-top:5px;
+}
+
+.game-card footer{
+    background:#111;
+    text-align:center;
+    padding:8px;
+}
+
+.game-card footer a{
+    color:#00c853;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+/* RESPONSIVO */
+@media(max-width:768px){
+    .game-card{
+        min-width:180px;
+        max-width:180px;
+    }
+}
+
+</style>
+
+
 
      </head>
 
@@ -477,53 +351,39 @@ body.dark-mode .game-card .info .horario {
       </div>
     </header>
 
-    <!-- Barra de Pesquisa -->
-    <div class="search-container">
-      <form action="" method="get" id="searchForm">
-        <input
-          type="text"
-          name="search"
-          placeholder="Pesquisar por time ou campeonato"
-          value=""
-        />
-        <input type="submit" value="Buscar" />
-      </form>
-    </div>
 
-    <!-- Botão Atualizar Jogos integrado ao layout -->
-    <div class="refresh-container">
-      <button id="refreshButton" class="refresh-btn">Atualizar Jogos</button>
-    </div>
-
-<!-- Brasileiro Série B - Cuiabá vs Paysandu -->
 <div class="games-container" id="gamesContainer">
-        <div class="game-card">
+
+    <!-- CARD 1 -->
+    <div class="game-card">
         <header>
             <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/liverpool.png" alt="Liverpool">
+                <img src="https://imgs.futebol7k.com/imgs/liverpool.png">
                 <span>Liverpool</span>
             </div>
             <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/manchester-city.png" alt="Manchester City">
-                <span>Manchester City</span>
+                <img src="https://imgs.futebol7k.com/imgs/manchester-city.png">
+                <span>Man City</span>
             </div>
         </header>
         <div class="info">
-            <div class="campeonato">Ingles</div>
+            <div class="campeonato">Inglês</div>
             <div class="horario">13:30</div>
         </div>
         <footer>
-            <a href="/espn1">Assistir</a>
+            <a href="#">Assistir</a>
         </footer>
     </div>
-        <div class="game-card">
+
+    <!-- CARD 2 -->
+    <div class="game-card">
         <header>
             <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/bayern-de-munique.png" alt="Bayern">
+                <img src="https://imgs.futebol7k.com/imgs/bayern-de-munique.png">
                 <span>Bayern</span>
             </div>
             <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/hoffenheim.png" alt="Hoffenheim">
+                <img src="https://imgs.futebol7k.com/imgs/hoffenheim.png">
                 <span>Hoffenheim</span>
             </div>
         </header>
@@ -532,55 +392,19 @@ body.dark-mode .game-card .info .horario {
             <div class="horario">13:30</div>
         </div>
         <footer>
-            <a href="/sportv1">Assistir</a>
+            <a href="#">Assistir</a>
         </footer>
     </div>
-        <div class="game-card">
+
+    <!-- CARD 3 -->
+    <div class="game-card">
         <header>
             <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/juazeirense.png" alt="Juazeirense">
-                <span>Juazeirense</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/bahia.png" alt="Bahia">
-                <span>Bahia</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Baiano</div>
-            <div class="horario">16:00</div>
-        </div>
-        <footer>
-            <a href="/sportv2">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/noroeste.png" alt="Noroeste">
-                <span>Noroeste</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/santos.png" alt="Santos">
-                <span>Santos</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Paulista</div>
-            <div class="horario">16:00</div>
-        </div>
-        <footer>
-            <a href="/espn4">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/juventus.png" alt="Juventus">
+                <img src="https://imgs.futebol7k.com/imgs/juventus.png">
                 <span>Juventus</span>
             </div>
             <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/lazio.png" alt="Lazio">
+                <img src="https://imgs.futebol7k.com/imgs/lazio.png">
                 <span>Lazio</span>
             </div>
         </header>
@@ -589,190 +413,32 @@ body.dark-mode .game-card .info .horario {
             <div class="horario">16:45</div>
         </div>
         <footer>
-            <a href="/globorj">Assistir</a>
+            <a href="#">Assistir</a>
         </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/psg.png" alt="PSG">
-                <span>PSG</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/olympique.png" alt="Olympique">
-                <span>Olympique</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Francês</div>
-            <div class="horario">16:45</div>
-        </div>
-        <footer>
-            <a href="/tnt">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/valencia.png" alt="Valencia">
-                <span>Valencia</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/real-madrid.png" alt="Real Madrid">
-                <span>Real Madrid</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Espanhol</div>
-            <div class="horario">17:00</div>
-        </div>
-        <footer>
-            <a href="/espn">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/ceara.png" alt="Ceará">
-                <span>Ceará</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/bahia.png" alt="Fortaleza">
-                <span>Fortaleza</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Cearense</div>
-            <div class="horario">18:00</div>
-        </div>
-        <footer>
-            <a href="https://futebol7k.com/jogo.php?id=12974">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/cruzeiro.png" alt="Cruzeiro">
-                <span>Cruzeiro</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/america-mg.png" alt="América-MG">
-                <span>América-MG</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Mineiro</div>
-            <div class="horario">18:00</div>
-        </div>
-        <footer>
-            <a href="https://futebol7k.com/jogo.php?id=12975">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/vasco.png" alt="Vasco">
-                <span>Vasco</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/botafogo.png" alt="Botafogo">
-                <span>Botafogo</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Carioca</div>
-            <div class="horario">18:00</div>
-        </div>
-        <footer>
-            <a href="https://futebol7k.com/jogo.php?id=12976">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/internacional.png" alt="Internacional">
-                <span>Internacional</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/sao-luiz.png" alt="São Luiz">
-                <span>São Luiz</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Gaucho</div>
-            <div class="horario">18:00</div>
-        </div>
-        <footer>
-            <a href="https://futebol7k.com/jogo.php?id=12977">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/corinthians.png" alt="Corinthians">
-                <span>Corinthians</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/palmeiras.png" alt="Palmeiras">
-                <span>Palmeiras</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Paulista</div>
-            <div class="horario">20:30</div>
-        </div>
-        <footer>
-            <a href="https://futebol7k.com/jogo.php?id=12978">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/fluminense.png" alt="Fluminense">
-                <span>Fluminense</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/sem-logo.png" alt="Marica">
-                <span>Marica</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Carioca</div>
-            <div class="horario">20:30</div>
-        </div>
-        <footer>
-            <a href="https://futebol7k.com/jogo.php?id=12979">Assistir</a>
-        </footer>
-    </div>
     </div>
 
-
-
- 
-
-<!-- Botão Voltar ao Topo -->
-<div class="back-to-top" id="backToTop">↑ Topo</div>
-
-
+</div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const input = document.querySelector('input[name="search"]');
-    const cards = document.querySelectorAll('.game-card');
+const container = document.getElementById("gamesContainer");
 
-    input.addEventListener('input', function () {
-      const termo = input.value.toLowerCase();
+let scrollAmount = 0;
+let cardWidth = 235; // largura aproximada do card + gap
 
-      cards.forEach(card => {
-        const texto = card.innerText.toLowerCase();
-        if (texto.includes(termo)) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+function autoSlide(){
+    if(scrollAmount >= container.scrollWidth - container.clientWidth){
+        scrollAmount = 0;
+    } else {
+        scrollAmount += cardWidth;
+    }
+
+    container.scrollTo({
+        left: scrollAmount,
+        behavior: "smooth"
     });
-  });
+}
+
+setInterval(autoSlide, 3000); // troca a cada 3 segundos
 </script>
   
   
