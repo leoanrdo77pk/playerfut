@@ -15,37 +15,38 @@ module.exports = (req, res) => {
       'Cache-Control': 'no-store'
     });
 
-    res.end(`
-<!DOCTYPE html>
+    res.end(`<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Assistir ${canal.toUpperCase()} Ao Vivo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #000;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>${canal.toUpperCase()} - PlayerFut</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100vh;
+    border: 0;
+    display: block;
+  }
+</style>
 </head>
+
 <body>
   <iframe 
-    src="${playerUrl}" 
-    allowfullscreen 
-    allow="autoplay; encrypted-media">
+    src="${playerUrl}"
+    allowfullscreen
+    allow="autoplay; encrypted-media; picture-in-picture">
   </iframe>
 </body>
-</html>
-    `);
-
+</html>`);
+    
   } catch (err) {
     console.error(err);
     res.writeHead(500, { 'Content-Type': 'text/plain' });
