@@ -1,55 +1,167 @@
-module.exports = (req, res) => {
-  try {
-    let canal = req.url.split('?')[0];
-    canal = canal.replace(/^\/+/, '').toLowerCase();
+const https = require('https');
 
-    if (!canal || canal === 'favicon.ico') {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      return res.end('Canal não informado');
+/* =========================
+   DOMÍNIOS FUTEBOL7K
+========================= */
+const DOMINIOS_FUTEBOL7K = [
+  'futebol7k.com',
+  'www.futebol7k.com'
+];
+
+/* =========================
+   FUNÇÃO FETCH
+========================= */
+function fetchUrl(url, reqHeaders) {
+  return new Promise((resolve, reject) => {
+    https.get(url, { headers: reqHeaders }, (res) => {
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => resolve({ res, data }));
+      } else {
+        res.resume();
+        reject(new Error('Status ' + res.statusCode));
+      }
+    }).on('error', reject);
+  });
+}
+
+/* =========================
+   EXPORT PRINCIPAL
+========================= */
+module.exports = async (req, res) => {
+  try {
+
+    let path = req.url === '/' ? '' : req.url;
+
+    /* =====================================================
+       1️⃣ SE NÃO FOR FUTEBOL7K → REDIRECIONA PARA SINALPUBLICO
+    ====================================================== */
+    if (!path.startsWith('/futebol7k') && path !== '') {
+      const canal = path.replace('/', '');
+      const playerUrl = `https://sinalpublico.vercel.app/play/dtv.html?id=${encodeURIComponent(canal)}`;
+
+      res.writeHead(302, { Location: playerUrl });
+      return res.end();
     }
 
-    const playerUrl = `https://sinalpublico.vercel.app/play/dtv.html?id=${encodeURIComponent(canal)}`;
+    /* =====================================================
+       2️⃣ TRATAR FUTEBOL7K
+    ====================================================== */
 
-    res.writeHead(200, {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'no-store'
-    });
+    // Remove prefixo
+    path = path.replace('/futebol7k', '') || '';
 
-    res.end(`<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>${canal.toUpperCase()} - PlayerFut</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    const reqHeaders = {
+      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+      'Referer': `https://${DOMINIOS_FUTEBOL7K[0]}/`,
+    };
 
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #000;
-  }
+    let fetched = null;
+    let dominioUsado = null;
 
-  iframe {
-    width: 100%;
-    height: 100vh;
-    border: 0;
-    display: block;
-  }
-</style>
-</head>
+    // tenta todos os domínios
+    for (const dominio of DOMINIOS_FUTEBOL7K) {
+      try {
+        const url = `https://${dominio}${path}`;
+        fetched = await fetchUrl(url, reqHeaders);
+        dominioUsado = dominio;
+        break;
+      } catch (_) {}
+    }
 
-<body>
-  <iframe 
-    src="${playerUrl}"
-    allowfullscreen
-    allow="autoplay; encrypted-media; picture-in-picture">
-  </iframe>
-</body>
-</html>`);
-    
+    if (!fetched) {
+      res.statusCode = 404;
+      return res.end('Conteúdo não encontrado.');
+    }
+
+    const { res: respOrig, data } = fetched;
+
+    /* =====================================================
+       3️⃣ PLAYLIST M3U8
+    ====================================================== */
+    if (/\.m3u8$/i.test(path)) {
+      let playlist = data.replace(/(.*\.ts)/g, (match) => {
+        if (match.startsWith('http')) {
+          return match.replace(new RegExp(`https?:\/\/${dominioUsado}\/`), '/futebol7k/');
+        }
+        return `/futebol7k/${match}`;
+      });
+
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.apple.mpegurl',
+        'Access-Control-Allow-Origin': '*'
+      });
+
+      return res.end(playlist);
+    }
+
+    /* =====================================================
+       4️⃣ ARQUIVOS ESTÁTICOS
+    ====================================================== */
+    if (/\.(ts|mp4|webm|ogg|jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i.test(path)) {
+      const fileUrl = `https://${dominioUsado}${path.startsWith('/') ? path : '/' + path}`;
+
+      https.get(fileUrl, { headers: reqHeaders }, (streamResp) => {
+        res.writeHead(streamResp.statusCode, streamResp.headers);
+        streamResp.pipe(res);
+      }).on('error', (err) => {
+        console.error('Erro proxy estático:', err);
+        res.statusCode = 500;
+        res.end('Erro ao carregar assets.');
+      });
+
+      return;
+    }
+
+    /* =====================================================
+       5️⃣ HTML
+    ====================================================== */
+    if (respOrig.headers['content-type']?.includes('text/html')) {
+
+      let html = data;
+
+      const headers = { ...respOrig.headers };
+      delete headers['x-frame-options'];
+      delete headers['content-security-policy'];
+
+      const dominioRegex = new RegExp(`https?:\/\/(?:${DOMINIOS_FUTEBOL7K.join('|')})\/`, 'g');
+      html = html.replace(dominioRegex, '/futebol7k/');
+
+      html = html
+        .replace(/src=["']https?:\/\/(?:[^\/]+)\/([^"']+)["']/g, 'src="/futebol7k/$1"')
+        .replace(/href=["']https?:\/\/(?:[^\/]+)\/([^"']+)["']/g, 'href="/futebol7k/$1"')
+        .replace(/action=["']https?:\/\/(?:[^\/]+)\/([^"']+)["']/g, 'action="/futebol7k/$1"')
+        .replace(/url\(["']?https?:\/\/(?:[^\/]+)\/(.*?)["']?\)/g, 'url("/futebol7k/$1")')
+        .replace(/<iframe([^>]*)src=["']https?:\/\/(?:[^\/]+)\/([^"']+)["']/g, '<iframe$1src="/futebol7k/$2"')
+        .replace(/<base[^>]*>/gi, '');
+
+      // Remove header visual
+      html = html
+        .replace(/<header[\s\S]*?<\/header>/gi, '')
+        .replace(/<nav[\s\S]*?<\/nav>/gi, '');
+
+      // Troca título
+      html = html.replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>');
+
+      res.writeHead(200, {
+        ...headers,
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'text/html'
+      });
+
+      return res.end(html);
+    }
+
+    /* =====================================================
+       6️⃣ OUTROS TIPOS
+    ====================================================== */
+    res.writeHead(respOrig.statusCode, respOrig.headers);
+    res.end(data);
+
   } catch (err) {
-    console.error(err);
-    res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end('Erro interno');
+    console.error('Erro geral proxy:', err);
+    res.statusCode = 500;
+    res.end('Erro interno.');
   }
 };
