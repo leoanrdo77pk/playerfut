@@ -28,8 +28,8 @@ module.exports = (req, res) => {
         method: 'GET',
         headers: {
           'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
-          'Referer': 'https://futebol7k.com/',
-          'Origin': 'https://futebol7k.com'
+          'Referer': 'https://futebol7k.com/jogo.php?id=',
+          'Origin': 'https://futebol7k.com/jogo.php?id='
         }
       };
 
