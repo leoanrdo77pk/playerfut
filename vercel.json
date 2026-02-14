@@ -2,7 +2,7 @@
   "version": 2,
   "routes": [
     {
-      "src": "/futebol7k/(.*)",
+      "src": "/futebol7k.com/jogo.php?id=(.*)",
       "dest": "/api/index.js"
     },
     {
