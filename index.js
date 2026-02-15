@@ -11,17 +11,20 @@ module.exports = async (req, res) => {
         'Referer': 'https://futebol7k.com/',
       }
     }, (resp) => {
+
       let data = '';
 
       resp.on('data', chunk => data += chunk);
+
       resp.on('end', () => {
+
         try {
-          // Remove cabeçalhos que bloqueiam exibição
+
           const headers = { ...resp.headers };
           delete headers['x-frame-options'];
           delete headers['content-security-policy'];
 
-          // Reescrever URLs absolutas e relativas para seu domínio
+          // 🔁 Reescrever URLs
           data = data
             .replace(/https:\/\/futebol7k\.com\//g, '/')
             .replace(/src="https:\/\/futebol7k\.com\/([^"]+)"/g, 'src="/$1"')
@@ -33,33 +36,51 @@ module.exports = async (req, res) => {
             .replace(/<iframe([^>]*)src=["']https:\/\/futebol7k\.com\/([^"']+)["']/g, '<iframe$1src="/$2"')
             .replace(/<base[^>]*>/gi, '');
 
-          // Alterar título, remover ícone e inserir meta de verificação
+          // 🎨 Ajustes visuais
           data = data
             .replace(/<title>[^<]*<\/title>/, '<title>Futebol ao Vivo</title>')
             .replace(/<link[^>]*rel=["']icon["'][^>]*>/gi, '')
-            .replace(/<head>/i, `<head>\n<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`);
+            .replace(/<head>/i, `<head>
+<meta name="ppck-ver" content="82de547bce4b26acfb7d424fc45ca87d" />`);
 
-          // **Remover todos os scripts (pop-ups e anúncios)**
+          // 🚫 Remover scripts antigos
           data = data.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
 
-          // Injetar banner simples
-          const banner = `
-<div id="custom-footer">
-<script type="text/javascript" src="//static.scptp9.com/mnpw3.js"></script>
-<script>
-mnpw.add('https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0005&pud=scptp9', {
-  newTab: true,
-  cookieExpires: 86401
-});
+          // ==============================
+          // 🔥 NOVO ANÚNCIO BIDVERTISER
+          // ==============================
+          const anuncio = `
+<div id="ntv_2103671"></div>
+<script type="text/javascript">
+(function(d) {
+	var params =
+	{
+		bvwidgetid: "ntv_2103671",
+		bvlinksownid: 2103671,
+		rows: 1,
+		cols: 2,
+		textpos: "below",
+		imagewidth: 150,
+		mobilecols: 2,
+		cb: (new Date()).getTime()
+	};
+	params.bvwidgetid = "ntv_2103671" + params.cb;
+	d.getElementById("ntv_2103671").id = params.bvwidgetid;
+	var qs = Object.keys(params).reduce(function(a, k){ a.push(k + '=' + encodeURIComponent(params[k])); return a},[]).join(String.fromCharCode(38));
+	var s = d.createElement('script'); s.type='text/javascript';s.async=true;
+	var p = 'https:' == document.location.protocol ? 'https' : 'http';
+	s.src = p + "://cdn.hyperpromote.com/bidvertiser/tags/active/bdvws.js?" + qs;
+	d.getElementById(params.bvwidgetid).appendChild(s);
+})(document);
 </script>
-</div>
 `;
 
+          // 📌 Inserir antes do </body>
           let finalHtml;
           if (data.includes('</body>')) {
-            finalHtml = data.replace('</body>', `${banner}</body>`);
+            finalHtml = data.replace('</body>', `${anuncio}</body>`);
           } else {
-            finalHtml = `${data}${banner}`;
+            finalHtml = data + anuncio;
           }
 
           res.writeHead(200, {
@@ -75,7 +96,9 @@ mnpw.add('https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004
           res.statusCode = 500;
           res.end("Erro ao processar o conteúdo.");
         }
+
       });
+
     }).on("error", (err) => {
       console.error("Erro ao buscar conteúdo:", err);
       res.statusCode = 500;
@@ -88,4 +111,3 @@ mnpw.add('https://t.mbsrv2.com/273605/7566?popUnder=true&aff_sub5=SF_006OG000004
     res.end("Erro interno.");
   }
 };
-
