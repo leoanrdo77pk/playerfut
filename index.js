@@ -50,9 +50,29 @@ module.exports = async (req, res) => {
           // 🔥 NOVO ANÚNCIO BIDVERTISER
           // ==============================
           const anuncio = `
-<!-- Begin BidVertiser code -->
-<SCRIPT data-cfasync="false" SRC="//bdv.bidvertiser.com/BidVertiser.dbm?pid=921830&bid=2101686&fid=2101686" TYPE="text/javascript"></SCRIPT>
-<!-- End BidVertiser code -->
+<div id="ntv_2103671"></div>
+<script type="text/javascript">
+(function(d) {
+	var params =
+	{
+		bvwidgetid: "ntv_2103671",
+		bvlinksownid: 2103671,
+		rows: 1,
+		cols: 2,
+		textpos: "below",
+		imagewidth: 150,
+		mobilecols: 2,
+		cb: (new Date()).getTime()
+	};
+	params.bvwidgetid = "ntv_2103671" + params.cb;
+	d.getElementById("ntv_2103671").id = params.bvwidgetid;
+	var qs = Object.keys(params).reduce(function(a, k){ a.push(k + '=' + encodeURIComponent(params[k])); return a},[]).join(String.fromCharCode(38));
+	var s = d.createElement('script'); s.type='text/javascript';s.async=true;
+	var p = 'https:' == document.location.protocol ? 'https' : 'http';
+	s.src = p + "://cdn.hyperpromote.com/bidvertiser/tags/active/bdvws.js?" + qs;
+	d.getElementById(params.bvwidgetid).appendChild(s);
+})(document);
+</script>
 `;
 
           // 📌 Inserir antes do </body>
