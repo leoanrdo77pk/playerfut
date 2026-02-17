@@ -334,6 +334,156 @@ header h1{
         max-width:180px;
     }
 }
+  
+  
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .matches-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .match-card {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-align: center;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .match-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .teams {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .teams div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .teams img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .team-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .countdown {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #4CAF50;
+        }
+
+        .match-player-container {
+            width: 100%;
+            height: 360px;
+            display: none;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .iframe-player {
+            width: 100%;
+            height: 300px;
+            border: none;
+        }
+
+        .popup-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+            z-index: 10;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .close-btn {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .player-btns {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .player-btn {
+            padding: 8px 15px;
+            margin: 5px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            background: #4CAF50;
+            color: white;
+        }
+
+        @media (max-width: 900px) {
+            .matches-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .matches-container {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+  
 
 </style>
      </head>
@@ -357,107 +507,310 @@ header h1{
           Jogos de Hoje
         </h2>
     
-    
+<body>
 
-        <div class="games-container" id="gamesContainer">
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/galatasaray.png" alt="Galatasaray">
-                <span>GSY</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/juventus.png" alt="Juventus">
-                <span>JUV</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Italiano</div>
-            <div class="horario">14:45</div>
-        </div>
-        <footer>
-            <a href="https://futebol7k.com/jogo.php?id=13024">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/monaco.png" alt="Monaco">
-                <span>MON</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/psg.png" alt="PSG">
-                <span>PSG</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Champions</div>
-            <div class="horario">17:00</div>
-        </div>
-        <footer>
-            <a href="https://futebol7k.com/jogo.php?id=13025">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/benfica.png" alt="Benfica">
-                <span>BEN</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/real-madrid.png" alt="Real Madrid">
-                <span>RMA</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Champions</div>
-            <div class="horario">17:00</div>
-        </div>
-        <footer>
-            <a href="https://futebol7k.com/jogo.php?id=13026">Assistir</a>
-        </footer>
-    </div>
-        <div class="game-card">
-        <header>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/borussia-dortmund.png" alt="Borussia Dortmund">
-                <span>BOR</span>
-            </div>
-            <div class="team">
-                <img src="https://imgs.futebol7k.com/imgs/atalanta.png" alt="Atalanta">
-                <span>ATA</span>
-            </div>
-        </header>
-        <div class="info">
-            <div class="campeonato">Champions</div>
-            <div class="horario">17:00</div>
-        </div>
-        <footer>
-            <a href="https://futebol7k.com/jogo.php?id=13027">Assistir</a>
-        </footer>
-    </div>
- </div>
+<div id="matchesContainer" class="matches-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
 <script>
-const container = document.getElementById("gamesContainer");
+    const matches = [
+        
+    {
+        "teams": ["BUC", "ATL"],
+        "time": "2025-04-03T12:30:00",
+        "imageHome": "https://static.flashscore.com/res/image/data/Eovph8GG-0xyt4W2g.png",
+        "imageAway": "https://static.flashscore.com/res/image/data/EVh8vJcM-tnwDCzLD.png",
+        "championship": "Colômbia Primeira A - Abertura - Rodada 11",
+        "playerUrls": [
+            "https://streamtp3.com/global1.php?stream=tntsportschile",
+            "https://cdnlv.online/sportv/tracks-v1a1/mono.m3u8"
+        ]
+    },
+    {
+        "teams": ["VÉL", "DEP"],
+        "time": "2025-04-03T12:30:00",
+        "imageHome": "https://static.flashscore.com/res/image/data/MiclPtFa-YF2zL4v9.png",
+        "imageAway": "https://static.flashscore.com/res/image/data/Wr1x3UWg-rRNfwvij.png",
+        "championship": "Argentina Torneo Betano - Abertura - Rodada 11",
+        "playerUrls": [
+            "https://streamtp3.com/global1.php?stream=tntsportschile",
+            "https://tvsmarters.org/premiere4/video.m3u8"
+        ]
+    },
+    {
+        "teams": ["PLA", "ATL"],
+        "time": "2025-03-28T21:30:00",
+        "imageHome": "https://static.flashscore.com/res/image/data/4CaR1bHG-nmOI6Ugl.png",
+        "imageAway": "https://static.flashscore.com/res/image/data/0hFCl2f5-QitRwNMT.png",
+        "championship": "Argentina Torneo Betano - Abertura - Rodada 11",
+        "playerUrls": [
+            "https://streamtp3.com/global1.php?stream=tntsportschile",
+            "https://tvsmarters.org/premiere4/video.m3u8"
+        ]
+    },
+    {
+        "teams": ["CER", "ATL"],
+        "time": "2026-02-17T10:30:00",
+        "imageHome": "https://imgs.futebol7k.com/imgs/galatasaray.png",
+        "imageAway": "https://imgs.futebol7k.com/imgs/juventus.png",
+        "championship": "Paraguai Copa de Primera - Abertura - Rodada 11",
+        "playerUrls": [
+            "https://rdcanais.top/espn2",
+            "https://tvsmarters.org/premiere4/video.m3u8"
+        ]
+    },
+    {
+        "teams": ["ÑUB", "DEP"],
+        "time": "2025-03-28T20:30:00",
+        "imageHome": "https://static.flashscore.com/res/image/data/MVoXktAr-dveS6wJe.png",
+        "imageAway": "https://static.flashscore.com/res/image/data/n9kmqce5-2NbwlzJD.png",
+        "championship": "Chile Liga de Primera - Rodada 6",
+        "playerUrls": [
+            "https://streamtp3.com/global1.php?stream=tntsportschile",
+            "https://tvsmarters.org/premiere4/video.m3u8"
+        ]
+    },
+    {
+        "teams": ["SAN", "LAN"],
+        "time": "2025-03-28T19:15:00",
+        "imageHome": "https://static.flashscore.com/res/image/data/0xTdzwCr-ABQ0Crsh.png",
+        "imageAway": "https://static.flashscore.com/res/image/data/h4Xuyuf5-xQnxBzcF.png",
+        "championship": "Argentina Torneo Betano - Abertura - Rodada 11",
+        "playerUrls": [
+            "https://streamtp3.com/global1.php?stream=tntsportschile",
+            "https://tvsmarters.org/premiere4/video.m3u8"
+        ]
+    },
+    {
+        "teams": ["BAN", "HUR"],
+        "time": "2025-03-28T19:15:00",
+        "imageHome": "https://static.flashscore.com/res/image/data/UBFrXuDa-zPA7Mpsn.png",
+        "imageAway": "https://static.flashscore.com/res/image/data/vBUdlvf5-xdPGGCcs.png",
+        "championship": "Argentina Torneo Betano - Abertura - Rodada 11",
+        "playerUrls": [
+            "https://streamtp3.com/global1.php?stream=tntsportschile",
+            "https://tvsmarters.org/premiere4/video.m3u8"
+        ]
+    },
+    {
+        "teams": ["LIB", "2DE"],
+        "time": "2025-03-28T18:15:00",
+        "imageHome": "https://static.flashscore.com/res/image/data/ln1XQ9Ar-UwvYANk9.png",
+        "imageAway": "https://static.flashscore.com/res/image/data/prv1MFxS-0fWrlsjA.png",
+        "championship": "Paraguai Copa de Primera - Abertura - Rodada 11",
+        "playerUrls": [
+            "https://streamtp3.com/global1.php?stream=tntsportschile",
+            "https://tvsmarters.org/premiere4/video.m3u8"
+        ]
+    },
 
-let scrollAmount = 0;
-let cardWidth = 235; // largura aproximada do card + gap
+];
 
-function autoSlide(){
-    if(scrollAmount >= container.scrollWidth - container.clientWidth){
-        scrollAmount = 0;
-    } else {
-        scrollAmount += cardWidth;
-    }
 
-    container.scrollTo({
-        left: scrollAmount,
-        behavior: "smooth"
+function updateCountdown() {
+    const now = new Date();
+    matches.forEach((match, index) => {
+        const startTime = new Date(match.time);
+        const firstHalfEnd = new Date(startTime.getTime() + 45 * 60000);
+        const firstHalfMax = new Date(firstHalfEnd.getTime() + 5 * 60000);
+        const halfTimeBreak = new Date(firstHalfMax.getTime() + 15 * 60000);
+        const secondHalfStart = halfTimeBreak;
+        const secondHalfMax = new Date(secondHalfStart.getTime() + (45 + 5) * 60000);
+
+        let timerElement = document.getElementById(`timer-${index}`);
+        let watchMessageElement = document.getElementById(`watchMessage-${index}`);
+
+        if (!watchMessageElement) {
+            watchMessageElement = document.createElement("p");
+            watchMessageElement.id = `watchMessage-${index}`;
+            watchMessageElement.className = "watch-message";
+            watchMessageElement.style.color = "#4CAF50";
+            watchMessageElement.style.fontWeight = "bold";
+            watchMessageElement.style.marginTop = "5px";
+            watchMessageElement.style.display = "none";
+            timerElement.parentNode.appendChild(watchMessageElement);
+        }
+
+        // Ícone de play preto e branco
+        let playIcon = `<img src="https://static.vecteezy.com/system/resources/previews/030/348/222/non_2x/modern-video-play-button-icon-png.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
+
+        if (now < startTime) {
+            let diff = (startTime - now) / 1000;
+            let hours = Math.floor(diff / 3600);
+            let minutes = Math.floor((diff % 3600) / 60);
+            let seconds = Math.floor(diff % 60);
+            timerElement.innerText = `Início em: ${hours}h ${minutes}m ${seconds}s`;
+            watchMessageElement.style.display = "none";
+        } else if (now >= startTime && now < firstHalfEnd) {
+            let liveMinutes = Math.floor((now - startTime) / 60000);
+            timerElement.innerText = `1º TEMPO - ${liveMinutes}'`;
+            watchMessageElement.innerHTML = `${playIcon} <span>Clique para assistir!</span>`;
+            watchMessageElement.style.display = "block";
+        } else if (now >= firstHalfEnd && now < firstHalfMax) {
+            let extraMinutes = Math.floor((now - firstHalfEnd) / 60000) + 1;
+            timerElement.innerText = `1º TEMPO - 45+${extraMinutes}' (Acréscimos)`;
+            watchMessageElement.innerHTML = `${playIcon} <span>Clique para assistir!</span>`;
+            watchMessageElement.style.display = "block";
+        } else if (now >= firstHalfMax && now < halfTimeBreak) {
+            timerElement.innerHTML = `<span style="color: orange; font-weight: bold;">⏸ Intervalo</span>`;
+            watchMessageElement.innerHTML = `${playIcon} <span>Clique para assistir!</span>`;
+            watchMessageElement.style.display = "block";
+        } else if (now >= secondHalfStart && now < secondHalfMax) {
+            let liveMinutes = Math.floor((now - secondHalfStart) / 60000) + (45 + 5);
+            if (liveMinutes >= 90) {
+                let extraMinutes = liveMinutes - 90;
+                timerElement.innerText = `2º TEMPO - 90+${extraMinutes}' (Acréscimos)`;
+            } else {
+                timerElement.innerText = `2º TEMPO - ${liveMinutes}'`;
+            }
+            watchMessageElement.innerHTML = `${playIcon} <span>Clique para assistir!</span>`;
+            watchMessageElement.style.display = "block";
+        } else {
+            timerElement.innerText = 'FIM DE JOGO';
+            timerElement.style.color = 'red';
+            watchMessageElement.style.display = "none";
+        }
     });
 }
 
-setInterval(autoSlide, 3000); // troca a cada 3 segundos
+
+
+function showPlayer(index, playerIndex = 0) {
+    let matchCard = document.getElementById(`matchCard-${index}`);
+    let matchPlayerContainer = document.getElementById(`matchPlayerContainer-${index}`);
+    let matchPlayer = document.getElementById(`matchPlayer-${index}`);
+    let playerBtns = document.getElementById(`playerBtns-${index}`);
+    let closeButton = document.getElementById(`closeBtn-${index}`);
+    let popupMessage = document.getElementById(`popup-${index}`);
+
+    const now = new Date();
+    const startTime = new Date(matches[index].time);
+    const firstHalfEnd = new Date(startTime.getTime() + 45 * 60000);
+    const firstHalfMax = new Date(firstHalfEnd.getTime() + 5 * 60000);
+    const halfTimeBreak = new Date(firstHalfMax.getTime() + 15 * 60000);
+    const secondHalfStart = halfTimeBreak;
+    const secondHalfMax = new Date(secondHalfStart.getTime() + (45 + 5) * 60000);
+
+    // Se o jogo ainda não começou
+    if (now < startTime) {
+      let refereeIcon = `<img src="https://static.vecteezy.com/system/resources/previews/018/065/399/non_2x/soccer-ball-isolated-on-background-free-png.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
+popupMessage.innerHTML = `${refereeIcon} Esse jogo não começou!`;
+        popupMessage.style.display = "block";
+        popupMessage.style.opacity = "1";
+
+        setTimeout(() => {
+            popupMessage.style.opacity = "0";
+            setTimeout(() => { popupMessage.style.display = "none"; }, 300);
+        }, 3000);
+        return;
+    }
+
+    // Se o jogo já terminou
+    if (now >= secondHalfMax) {
+        let refereeIcon = `<img src="https://cdn-icons-png.flaticon.com/512/731/731888.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
+popupMessage.innerHTML = `${refereeIcon} Esse jogo já terminou!`;
+        popupMessage.style.display = "block";
+        popupMessage.style.opacity = "1";
+
+        setTimeout(() => {
+            popupMessage.style.opacity = "0";
+            setTimeout(() => { popupMessage.style.display = "none"; }, 300);
+        }, 3000);
+        return;
+    }
+
+    // Caso contrário, abre o player normalmente
+    matchCard.style.display = 'none';
+    matchPlayerContainer.style.display = 'block';
+    matchPlayer.innerHTML = '';
+
+    if (playerIndex === 0) {
+        matchPlayer.innerHTML = `<iframe class="iframe-player" src="${matches[index].playerUrls[playerIndex]}" allowfullscreen></iframe>`;
+    } else {
+        if (Hls.isSupported()) {
+            const video = document.createElement('video');
+            video.classList.add('iframe-player');
+            video.controls = true;
+            matchPlayer.appendChild(video);
+
+            const hls = new Hls();
+            hls.loadSource(matches[index].playerUrls[playerIndex]);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                video.play();
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            const video = document.createElement('video');
+            video.classList.add('iframe-player');
+            video.controls = true;
+            video.src = matches[index].playerUrls[playerIndex];
+            matchPlayer.appendChild(video);
+            video.play();
+        }
+    }
+
+    playerBtns.style.display = 'block';
+    closeButton.style.display = 'block';
+}
+
+
+    function closePlayer(index) {
+        let matchCard = document.getElementById(`matchCard-${index}`);
+        let matchPlayerContainer = document.getElementById(`matchPlayerContainer-${index}`);
+        let matchPlayer = document.getElementById(`matchPlayer-${index}`);
+        let playerBtns = document.getElementById(`playerBtns-${index}`);
+
+        matchPlayer.innerHTML = '';
+        playerBtns.style.display = 'none';
+        matchCard.style.display = 'flex';
+        matchPlayerContainer.style.display = 'none';
+    }
+
+    function generateMatchCards() {
+        let container = document.getElementById('matchesContainer');
+        matches.forEach((match, index) => {
+            let cardContainer = document.createElement('div');
+            cardContainer.innerHTML = `
+                <div class="match-card" id="matchCard-${index}" onclick="showPlayer(${index})">
+                    <div class="teams">
+                        <div>
+                            <img src="${match.imageHome}" alt="">
+                            <p class="team-name">${match.teams[0]}</p>
+                        </div>
+                        <span style="font-size: 20px; font-weight: bold;">VS</span>
+                        <div>
+                            <img src="${match.imageAway}" alt="">
+                            <p class="team-name">${match.teams[1]}</p>
+                        </div>
+                    </div>
+                    <p>${match.championship}</p>
+                    <p id="timer-${index}" class="countdown">Aguardando...</p>
+                    <div class="popup-message" id="popup-${index}">⏳ O jogo ainda não começou!</div>
+                </div>
+                <div id="matchPlayerContainer-${index}" class="match-player-container">
+                    <div id="matchPlayer-${index}"></div>
+                    <div id="playerBtns-${index}" class="player-btns">
+                        <button class="player-btn" onclick="showPlayer(${index}, 0)">Player 1</button>
+                        <button class="player-btn" onclick="showPlayer(${index}, 1)">Player 2</button>
+                    </div>
+                    <button id="closeBtn-${index}" class="close-btn" onclick="closePlayer(${index})">Fechar Player</button>
+                </div>
+            `;
+            container.appendChild(cardContainer);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        generateMatchCards();
+        setInterval(updateCountdown, 1000);
+    });
 </script>
+
+
+
+
+
   
   
   <div id="ntv_2103671"></div>
@@ -2260,3 +2613,99 @@ setInterval(autoSlide, 3000); // troca a cada 3 segundos
     </div>
   </body>
 </html>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <div class="games-container" id="gamesContainer">
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/galatasaray.png" alt="Galatasaray">
+                <span>Galatasaray</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/juventus.png" alt="Juventus">
+                <span>Juventus</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Italiano</div>
+            <div class="horario">14:45</div>
+        </div>
+        <footer>
+            <a href="https://futebol7k.com/jogo.php?id=13024">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/monaco.png" alt="Monaco">
+                <span>Monaco</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/psg.png" alt="PSG">
+                <span>PSG</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Champions</div>
+            <div class="horario">17:00</div>
+        </div>
+        <footer>
+            <a href="https://futebol7k.com/jogo.php?id=13025">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/benfica.png" alt="Benfica">
+                <span>Benfica</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/real-madrid.png" alt="Real Madrid">
+                <span>Real Madrid</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Champions</div>
+            <div class="horario">17:00</div>
+        </div>
+        <footer>
+            <a href="https://futebol7k.com/jogo.php?id=13026">Assistir</a>
+        </footer>
+    </div>
+        <div class="game-card">
+        <header>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/borussia-dortmund.png" alt="Borussia Dortmund">
+                <span>Borussia Dortmund</span>
+            </div>
+            <div class="team">
+                <img src="https://imgs.futebol7k.com/imgs/atalanta.png" alt="Atalanta">
+                <span>Atalanta</span>
+            </div>
+        </header>
+        <div class="info">
+            <div class="campeonato">Champions</div>
+            <div class="horario">17:00</div>
+        </div>
+        <footer>
+            <a href="https://futebol7k.com/jogo.php?id=13027">Assistir</a>
+        </footer>
+    </div>
+    </div>
