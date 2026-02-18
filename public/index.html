@@ -346,11 +346,7 @@ body {
     font-size: 12px;
 }
 
-  .card-wrapper {
-    display: flex;
-    flex-direction: column;
-}
-
+  
   
 /* MOBILE AJUSTE */
 @media (max-width: 600px) {
@@ -612,18 +608,15 @@ popupMessage.innerHTML = `${refereeIcon} Esse jogo já terminou!`;
             hls.on(Hls.Events.MANIFEST_PARSED, function () {
                 video.play();
             });
-       } else {
-    const video = document.createElement('video');
-    video.classList.add('iframe-player');
-    video.controls = true;
-
-    if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = matches[index].playerUrls[playerIndex];
-        matchPlayer.appendChild(video);
-        video.play();
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            const video = document.createElement('video');
+            video.classList.add('iframe-player');
+            video.controls = true;
+            video.src = matches[index].playerUrls[playerIndex];
+            matchPlayer.appendChild(video);
+            video.play();
+        }
     }
-}
-
 
     playerBtns.style.display = 'block';
     closeButton.style.display = 'block';
