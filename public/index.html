@@ -497,12 +497,18 @@ const matches = [
 
 
 
-function updateCountdown(){
+function updateCountdown() {
     const now = new Date();
-
-    matches.forEach((match,index)=>{
+    matches.forEach((match, index) => {
         const startTime = new Date(match.time);
-        const timer = document.getElementById(`timer-${index}`);
+        const firstHalfEnd = new Date(startTime.getTime() + 45 * 60000);
+        const firstHalfMax = new Date(firstHalfEnd.getTime() + 5 * 60000);
+        const halfTimeBreak = new Date(firstHalfMax.getTime() + 15 * 60000);
+        const secondHalfStart = halfTimeBreak;
+        const secondHalfMax = new Date(secondHalfStart.getTime() + (45 + 5) * 60000);
+
+        let timerElement = document.getElementById(`timer-${index}`);
+        let watchMessageElement = document.getElementById(`watchMessage-${index}`);
 
         if(now < startTime){
             let diff = (startTime - now)/1000;
@@ -515,8 +521,6 @@ function updateCountdown(){
     });
 }
 
-        // Ícone de play preto e branco
-        let playIcon = `<img src="https://static.vecteezy.com/system/resources/previews/030/348/222/non_2x/modern-video-play-button-icon-png.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
 
         if (now < startTime) {
             let diff = (startTime - now) / 1000;
