@@ -510,17 +510,19 @@ function updateCountdown() {
         let timerElement = document.getElementById(`timer-${index}`);
         let watchMessageElement = document.getElementById(`watchMessage-${index}`);
 
-        if(now < startTime){
-            let diff = (startTime - now)/1000;
-            let m = Math.floor(diff/60);
-            let s = Math.floor(diff%60);
-            timer.innerText = `Início em ${m}m ${s}s`;
-        } else {
-            timer.innerHTML = "🔴 AO VIVO - Clique para assistir";
+        if (!watchMessageElement) {
+            watchMessageElement = document.createElement("p");
+            watchMessageElement.id = `watchMessage-${index}`;
+            watchMessageElement.className = "watch-message";
+            watchMessageElement.style.color = "#4CAF50";
+            watchMessageElement.style.fontWeight = "bold";
+            watchMessageElement.style.marginTop = "5px";
+            watchMessageElement.style.display = "none";
+            timerElement.parentNode.appendChild(watchMessageElement);
         }
-    });
-}
 
+        // Ícone de play preto e branco
+        let playIcon = `<img src="https://static.vecteezy.com/system/resources/previews/030/348/222/non_2x/modern-video-play-button-icon-png.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
 
         if (now < startTime) {
             let diff = (startTime - now) / 1000;
