@@ -422,7 +422,7 @@ const matches = [
 
     {
         "teams": ["QAR", "NEW"],
-        "time": "2026-02-18T11:20:00",
+        "time": "2026-02-18T14:45:00",
         "imageHome": "https://imgs.futebol7k.com/imgs/sem-logo.png",
         "imageAway": "https://imgs.futebol7k.com/imgs/newcastle-united.png",
         "championship": "Champions",
@@ -497,29 +497,23 @@ const matches = [
 
 
 
-function updateCountdown() {
+function updateCountdown(){
     const now = new Date();
-    matches.forEach((match, index) => {
+
+    matches.forEach((match,index)=>{
         const startTime = new Date(match.time);
-        const firstHalfEnd = new Date(startTime.getTime() + 45 * 60000);
-        const firstHalfMax = new Date(firstHalfEnd.getTime() + 5 * 60000);
-        const halfTimeBreak = new Date(firstHalfMax.getTime() + 15 * 60000);
-        const secondHalfStart = halfTimeBreak;
-        const secondHalfMax = new Date(secondHalfStart.getTime() + (45 + 5) * 60000);
+        const timer = document.getElementById(`timer-${index}`);
 
-        let timerElement = document.getElementById(`timer-${index}`);
-        let watchMessageElement = document.getElementById(`watchMessage-${index}`);
-
-        if (!watchMessageElement) {
-            watchMessageElement = document.createElement("p");
-            watchMessageElement.id = `watchMessage-${index}`;
-            watchMessageElement.className = "watch-message";
-            watchMessageElement.style.color = "#4CAF50";
-            watchMessageElement.style.fontWeight = "bold";
-            watchMessageElement.style.marginTop = "5px";
-            watchMessageElement.style.display = "none";
-            timerElement.parentNode.appendChild(watchMessageElement);
+        if(now < startTime){
+            let diff = (startTime - now)/1000;
+            let m = Math.floor(diff/60);
+            let s = Math.floor(diff%60);
+            timer.innerText = `Início em ${m}m ${s}s`;
+        } else {
+            timer.innerHTML = "🔴 AO VIVO - Clique para assistir";
         }
+    });
+}
 
         // Ícone de play preto e branco
         let playIcon = `<img src="https://static.vecteezy.com/system/resources/previews/030/348/222/non_2x/modern-video-play-button-icon-png.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
@@ -661,7 +655,7 @@ cardContainer.innerHTML =  `
                     </div>
                     <p>${match.championship}</p>
                     <p id="timer-${index}" class="countdown">Aguardando...</p>
-                    <div class="popup-message" id="popup-${index}">⏳ O jogo ainda não começou!</div>
+                    <div class="popup-message" id="popup-${index}"> O jogo ainda não começou!</div>
                 </div>
                 <div id="matchPlayerContainer-${index}" class="match-player-container">
                     <div id="matchPlayer-${index}"></div>
