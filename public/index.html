@@ -234,48 +234,59 @@
 <style>
 
   
-          body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f8f8;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-.matches-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
-    max-width: 1200px;
-    width: 100%;
-    margin-bottom: 30px;
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* CARD MENOR E MAIS COMPACTO */
-.match-card {
+/* CONTAINER AGORA É SLIDE */
+.matches-container {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    max-width: 1200px;
     width: 100%;
-    min-height: 200px;
+    padding-bottom: 10px;
+}
+
+/* remove scrollbar feia */
+.matches-container::-webkit-scrollbar {
+    height: 6px;
+}
+.matches-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+/* CARD MENOR */
+.match-card {
+    min-width: 240px;
+    height: 220px;
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 10px;
     background-color: #fff;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    scroll-snap-align: center;
     transition: all 0.3s ease;
     text-align: center;
     padding: 12px;
-    cursor: pointer;
+    flex-shrink: 0;
 }
 
 .match-card:hover {
     transform: scale(1.03);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* TIMES */
 .teams {
     display: flex;
     align-items: center;
@@ -283,43 +294,64 @@
     gap: 15px;
 }
 
-/* IMAGENS MENORES */
 .teams img {
     width: 45px;
     height: 45px;
 }
 
-/* NOME MENOR */
 .team-name {
     font-size: 14px;
     font-weight: bold;
     margin-top: 4px;
 }
 
-/* CAMPEONATO */
-.match-card p {
-    font-size: 13px;
-    margin: 5px 0;
-}
-
-/* CONTADOR */
 .countdown {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
-    margin-top: 5px;
+    margin-top: 8px;
     color: #4CAF50;
 }
 
-/* RESPONSIVO */
-@media (max-width: 768px) {
-    .matches-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
+/* PLAYER MENOR */
+.match-player-container {
+    width: 100%;
+    max-width: 800px;
+    height: 300px;
+    display: none;
+    text-align: center;
+    margin: 20px auto;
+    position: relative;
 }
 
-@media (max-width: 480px) {
-    .matches-container {
-        grid-template-columns: 1fr;
+.iframe-player {
+    width: 100%;
+    height: 250px;
+    border: none;
+    border-radius: 8px;
+}
+
+/* BOTÕES */
+.player-btns {
+    margin-top: 8px;
+}
+
+.player-btn {
+    padding: 6px 12px;
+    margin: 3px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    background: #4CAF50;
+    color: white;
+    font-size: 12px;
+}
+
+/* MOBILE AJUSTE */
+@media (max-width: 600px) {
+
+    .match-card {
+        min-width: 200px;
+        height: 200px;
     }
 
     .teams img {
@@ -327,9 +359,8 @@
         height: 40px;
     }
 
-    .match-card {
-        min-height: 180px;
-        padding: 10px;
+    .iframe-player {
+        height: 220px;
     }
 }
 
@@ -368,77 +399,78 @@ const matches = [
 
     {
         "teams": ["QAR", "NEW"],
-        "time": "2026-02-17T14:45:00",
+        "time": "2026-02-18T14:45:00",
         "imageHome": "https://imgs.futebol7k.com/imgs/sem-logo.png",
         "imageAway": "https://imgs.futebol7k.com/imgs/newcastle-united.png",
         "championship": "Champions",
         "playerUrls": [
-            "https://rdcanais.top/espn2",
-            "https://tvsmarters.org/premiere4/video.m3u8"
+            "https://rdcanais.top/tnt",
+            "https://rdcanais.top/space"
         ]
     },
 
     {
         "teams": ["BRU", "ATM"],
-        "time": "2026-02-17T17:00:00",
+        "time": "2026-02-18T17:00:00",
         "imageHome": "https://imgs.futebol7k.com/imgs/club-brugge.png",
         "imageAway": "https://imgs.futebol7k.com/imgs/atletico-de-madrid.png",
         "championship": "Champions",
         "playerUrls": [
             "https://rdcanais.top/tnt",
-            "https://tvsmarters.org/champions1/video.m3u8"
+            "https://rdcanais.top/space"
         ]
     },
 
     {
         "teams": ["WOL", "ARS"],
-        "time": "2026-02-17T17:00:00",
+        "time": "2026-02-18T17:00:00",
         "imageHome": "https://imgs.futebol7k.com/imgs/wolverhampton.png",
         "imageAway": "https://imgs.futebol7k.com/imgs/arsenal.png",
         "championship": "Champions",
         "playerUrls": [
-            "https://rdcanais.top/tntsports",
-            "https://tvsmarters.org/champions2/video.m3u8"
+            "https://rdcanais.top/tnt",
+            "https://rdcanais.top/space"
         ]
     },
 
     {
         "teams": ["OLY", "LEV"],
-        "time": "2026-02-17T17:00:00",
+        "time": "2026-02-18T17:00:00",
         "imageHome": "https://imgs.futebol7k.com/imgs/sem-logo.png",
         "imageAway": "https://imgs.futebol7k.com/imgs/bayer-leverkusen.png",
         "championship": "Champions",
         "playerUrls": [
-            "https://rdcanais.top/space",
-            "https://tvsmarters.org/champions3/video.m3u8"
+            "https://rdcanais.top/tnt",
+            "https://rdcanais.top/space"
         ]
     },
 
     {
         "teams": ["BOD", "INT"],
-        "time": "2026-02-17T17:00:00",
+        "time": "2026-02-18T17:00:00",
         "imageHome": "https://imgs.futebol7k.com/imgs/sem-logo.png",
         "imageAway": "https://imgs.futebol7k.com/imgs/internazionale.png",
         "championship": "Champions",
         "playerUrls": [
-            "https://rdcanais.top/espn",
-            "https://tvsmarters.org/champions4/video.m3u8"
+            "https://rdcanais.top/tnt",
+            "https://rdcanais.top/space"
         ]
     },
 
     {
         "teams": ["VIT", "BFE"],
-        "time": "2026-02-17T19:15:00",
+        "time": "2026-02-18T19:15:00",
         "imageHome": "https://imgs.futebol7k.com/imgs/vitoria.png",
         "imageAway": "https://imgs.futebol7k.com/imgs/bahia-de-feira.png",
         "championship": "Baiano",
         "playerUrls": [
-            "https://rdcanais.top/espn2",
-            "https://tvsmarters.org/premiere4/video.m3u8"
+            "https://rdcanais.top/tnt",
+            "https://rdcanais.top/space"
         ]
     }
 
 ];
+
 
 
 
@@ -605,7 +637,8 @@ popupMessage.innerHTML = `${refereeIcon} Esse jogo já terminou!`;
         let container = document.getElementById('matchesContainer');
         matches.forEach((match, index) => {
             let cardContainer = document.createElement('div');
-            cardContainer.innerHTML = `
+cardContainer.classList.add("card-wrapper");
+cardContainer.innerHTML =  `
                 <div class="match-card" id="matchCard-${index}" onclick="showPlayer(${index})">
                     <div class="teams">
                         <div>
