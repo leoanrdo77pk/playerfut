@@ -311,7 +311,7 @@
             color: #4CAF50;
         }
   
-  p {
+  .p {
             font-size: 9px;
             font-weight: bold;
             color: #000;
@@ -422,7 +422,7 @@ const matches = [
 
     {
         "teams": ["QAR", "NEW"],
-        "time": "2026-02-18T11:02:00",
+        "time": "2026-02-18T14:45:00",
         "imageHome": "https://imgs.futebol7k.com/imgs/sem-logo.png",
         "imageAway": "https://imgs.futebol7k.com/imgs/newcastle-united.png",
         "championship": "Champions",
@@ -583,8 +583,8 @@ function showPlayer(index, playerIndex = 0) {
 
     // Se o jogo ainda não começou
     if (now < startTime) {
-      let refereeIcon = `<img src="https://static.vecteezy.com/system/resources/previews/018/065/399/non_2x/soccer-ball-isolated-on-background-free-png.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
-popupMessage.innerHTML = `${refereeIcon} Esse jogo não começou!`;
+        let refereeIcon = `<img src="https://static.vecteezy.com/system/resources/previews/018/065/399/non_2x/soccer-ball-isolated-on-background-free-png.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
+        popupMessage.innerHTML = `${refereeIcon} Esse jogo não começou!`;
         popupMessage.style.display = "block";
         popupMessage.style.opacity = "1";
 
@@ -598,7 +598,7 @@ popupMessage.innerHTML = `${refereeIcon} Esse jogo não começou!`;
     // Se o jogo já terminou
     if (now >= secondHalfMax) {
         let refereeIcon = `<img src="https://cdn-icons-png.flaticon.com/512/731/731888.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
-popupMessage.innerHTML = `${refereeIcon} Esse jogo já terminou!`;
+        popupMessage.innerHTML = `${refereeIcon} Esse jogo já terminou!`;
         popupMessage.style.display = "block";
         popupMessage.style.opacity = "1";
 
@@ -609,39 +609,24 @@ popupMessage.innerHTML = `${refereeIcon} Esse jogo já terminou!`;
         return;
     }
 
-    // Caso contrário, abre o player normalmente
+    // ✅ Abre apenas iframe normal (SEM HLS / SEM m3u8)
     matchCard.style.display = 'none';
     matchPlayerContainer.style.display = 'block';
     matchPlayer.innerHTML = '';
 
-    if (playerIndex === 0) {
-        matchPlayer.innerHTML = `<iframe class="iframe-player" src="${matches[index].playerUrls[playerIndex]}" allowfullscreen></iframe>`;
-    } else {
-        if (Hls.isSupported()) {
-            const video = document.createElement('video');
-            video.classList.add('iframe-player');
-            video.controls = true;
-            matchPlayer.appendChild(video);
-
-            const hls = new Hls();
-            hls.loadSource(matches[index].playerUrls[playerIndex]);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function () {
-                video.play();
-            });
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            const video = document.createElement('video');
-            video.classList.add('iframe-player');
-            video.controls = true;
-            video.src = matches[index].playerUrls[playerIndex];
-            matchPlayer.appendChild(video);
-            video.play();
-        }
-    }
+    matchPlayer.innerHTML = `
+        <iframe 
+            class="iframe-player" 
+            src="${matches[index].playerUrls[playerIndex]}" 
+            frameborder="0" 
+            allowfullscreen>
+        </iframe>
+    `;
 
     playerBtns.style.display = 'block';
     closeButton.style.display = 'block';
 }
+
 
 
     function closePlayer(index) {
