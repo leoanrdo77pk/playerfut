@@ -744,16 +744,16 @@ function updateCountdown() {
         } else if (now >= startTime && now < firstHalfEnd) {
             let liveMinutes = Math.floor((now - startTime) / 60000);
             timerElement.innerText = `1º TEMPO - ${liveMinutes}'`;
-            watchMessageElement.innerHTML = `${playIcon} <span>Clique para assistir!</span>`;
+            watchMessageElement.innerHTML = `${playIcon};
             watchMessageElement.style.display = "block";
         } else if (now >= firstHalfEnd && now < firstHalfMax) {
             let extraMinutes = Math.floor((now - firstHalfEnd) / 60000) + 1;
             timerElement.innerText = `1º TEMPO - 45+${extraMinutes}' (Acréscimos)`;
-            watchMessageElement.innerHTML = `${playIcon} <span>Clique para assistir!</span>`;
+            watchMessageElement.innerHTML = `${playIcon};
             watchMessageElement.style.display = "block";
         } else if (now >= firstHalfMax && now < halfTimeBreak) {
             timerElement.innerHTML = `<span style="color: orange; font-weight: bold;">⏸ Intervalo</span>`;
-            watchMessageElement.innerHTML = `${playIcon} <span>Clique para assistir!</span>`;
+            watchMessageElement.innerHTML = `${playIcon};
             watchMessageElement.style.display = "block";
         } else if (now >= secondHalfStart && now < secondHalfMax) {
             let liveMinutes = Math.floor((now - secondHalfStart) / 60000) + (45 + 5);
@@ -763,7 +763,7 @@ function updateCountdown() {
             } else {
                 timerElement.innerText = `2º TEMPO - ${liveMinutes}'`;
             }
-            watchMessageElement.innerHTML = `${playIcon} <span>Clique para assistir!</span>`;
+            watchMessageElement.innerHTML = `${playIcon};
             watchMessageElement.style.display = "block";
         } else {
             timerElement.innerText = 'FIM DE JOGO';
