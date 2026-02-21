@@ -176,7 +176,7 @@
         padding: 0;
       }
       #st-1 .st-total > span.st-shares {
-        font-size: 9px;
+        font-size: 15px;
         line-height: 9px;
       }
       #st-1.st-justified {
@@ -721,7 +721,7 @@ function updateCountdown() {
             watchMessageElement.className = "watch-message";
             watchMessageElement.style.color = "#4CAF50";
             watchMessageElement.style.fontWeight = "bold";
-            watchMessageElement.style.marginTop = "5px";
+            watchMessageElement.style.marginTop = "10px";
             watchMessageElement.style.display = "none";
             timerElement.parentNode.appendChild(watchMessageElement);
         }
@@ -793,7 +793,7 @@ function showPlayer(index, playerIndex = 0) {
 
     // Se o jogo ainda não começou
     if (now < startTime) {
-        let refereeIcon = `<img src="https://static.vecteezy.com/system/resources/previews/018/065/399/non_2x/soccer-ball-isolated-on-background-free-png.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
+        let refereeIcon = `<img src="https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-blue-soccer-ball-png-image_10261267.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
         popupMessage.innerHTML = `${refereeIcon} Esse jogo não começou!`;
         popupMessage.style.display = "block";
         popupMessage.style.opacity = "1";
