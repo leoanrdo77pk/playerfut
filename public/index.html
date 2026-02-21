@@ -707,7 +707,12 @@ function updateCountdown() {
         }
 
         // Ícone de play preto e branco
-        let playIcon = `<img src="https://static.vecteezy.com/system/resources/previews/030/348/222/non_2x/modern-video-play-button-icon-png.png" width="20" height="20" style="vertical-align: base; margin-right: 50px;">`;
+        let playIcon = `
+    <span class="watch-content">
+        <img src="https://static.vecteezy.com/system/resources/previews/030/348/222/non_2x/modern-video-play-button-icon-png.png" class="play-icon">
+        <span>Clique para assistir!</span>
+    </span>
+`;
 
         if (now < startTime) {
             let diff = (startTime - now) / 1000;
