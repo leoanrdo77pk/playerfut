@@ -36,14 +36,33 @@ module.exports = (req, res) => {
     display: block;
   }
 </style>
+
 </head>
 
 <body>
-  <iframe 
-    src="${playerUrl}"
-    allowfullscreen
-    allow="autoplay; encrypted-media; picture-in-picture">
-  </iframe>
+
+<!-- HISTATS -->
+<div id="histats_counter"></div>
+<script type="text/javascript">
+var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,5010958,4,200,270,23,00011101']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+  var hs = document.createElement('script');
+  hs.type = 'text/javascript';
+  hs.async = true;
+  hs.src = ('//s10.histats.com/js15_as.js');
+  document.body.appendChild(hs);
+})();
+</script>
+<!-- FIM HISTATS -->
+
+<iframe 
+  src="${playerUrl}"
+  allowfullscreen
+  allow="autoplay; encrypted-media; picture-in-picture">
+</iframe>
+
 </body>
 </html>`);
     
