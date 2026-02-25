@@ -440,6 +440,27 @@ _Hasync.push(['Histats.track_hits', '']);
     .matches-container { grid-template-columns: repeat(1, 1fr); }
 }
 </style>
+        
+        
+ // ====== Função da Tab ======
+function toggleJogosHoje() {
+    const tab = document.getElementById('jogosHojeTab');
+    if(tab.style.display === 'none' || tab.style.display === '') {
+        tab.style.display = 'block';
+    } else {
+        tab.style.display = 'none';
+    }
+}
+       
+        
+        
+               
+        
+        
+        
+        
+ 
+
 
 <!-- JS COMPLETO DOS JOGOS -->
 <script>
@@ -619,115 +640,189 @@ const matches = [
 
 ];
 
+  
+  
+ // ====== Função da Tab ======
+function toggleJogosHoje() {
+    const tab = document.getElementById('jogosHojeTab');
+    if(tab.style.display === 'none' || tab.style.display === '') {
+        tab.style.display = 'block';
+    } else {
+        tab.style.display = 'none';
+    }
+}
+       
+         
+  
+  
+  
 function updateCountdown() {
     const now = new Date();
     matches.forEach((match, index) => {
         const startTime = new Date(match.time);
-        const firstHalfEnd = new Date(startTime.getTime() + 45*60000);
-        const firstHalfMax = new Date(firstHalfEnd.getTime() + 5*60000);
-        const halfTimeBreak = new Date(firstHalfMax.getTime() + 15*60000);
+        const firstHalfEnd = new Date(startTime.getTime() + 45 * 60000);
+        const firstHalfMax = new Date(firstHalfEnd.getTime() + 5 * 60000);
+        const halfTimeBreak = new Date(firstHalfMax.getTime() + 15 * 60000);
         const secondHalfStart = halfTimeBreak;
-        const secondHalfMax = new Date(secondHalfStart.getTime() + (45+5)*60000);
+        const secondHalfMax = new Date(secondHalfStart.getTime() + (45 + 5) * 60000);
 
-        let timer = document.getElementById(`timer-${index}`);
-        let watch = document.getElementById(`watchMessage-${index}`);
-        if(!watch){
-            watch = document.createElement("p");
-            watch.id = `watchMessage-${index}`;
-            watch.className = "watch-message";
-            watch.style.color="#4CAF50";
-            watch.style.fontWeight="bold";
-            watch.style.marginTop="10px";
-            watch.style.display="none";
-            timer.parentNode.appendChild(watch);
+        let timerElement = document.getElementById(`timer-${index}`);
+        let watchMessageElement = document.getElementById(`watchMessage-${index}`);
+
+        if (!watchMessageElement) {
+            watchMessageElement = document.createElement("p");
+            watchMessageElement.id = `watchMessage-${index}`;
+            watchMessageElement.className = "watch-message";
+            watchMessageElement.style.color = "#4CAF50";
+            watchMessageElement.style.fontWeight = "bold";
+            watchMessageElement.style.marginTop = "10px";
+            watchMessageElement.style.display = "none";
+            timerElement.parentNode.appendChild(watchMessageElement);
         }
-        let playIcon = `<span class="watch-content"><img src="https://static.vecteezy.com/system/resources/previews/030/348/222/non_2x/modern-video-play-button-icon-png.png" class="play-icon"><span>Clique para assistir!</span></span>`;
 
-        if(now < startTime){
-            let diff = (startTime - now)/1000;
-            let h=Math.floor(diff/3600);
-            let m=Math.floor((diff%3600)/60);
-            let s=Math.floor(diff%60);
-            timer.innerText = `Início em: ${h}h ${m}m ${s}s`;
-            watch.style.display="none";
-        } else if(now>=startTime && now<firstHalfEnd){
-            let liveM=Math.floor((now-startTime)/60000);
-            timer.innerText=`1º TEMPO - ${liveM}'`;
-            watch.innerHTML=playIcon; watch.style.display="block";
-        } else if(now>=firstHalfEnd && now<firstHalfMax){
-            let extra=Math.floor((now-firstHalfEnd)/60000)+1;
-            timer.innerText=`1º TEMPO - 45+${extra}' (Acréscimos)`;
-            watch.innerHTML=playIcon; watch.style.display="block";
-        } else if(now>=firstHalfMax && now<halfTimeBreak){
-            timer.innerHTML=`<span style="color: orange; font-weight: bold;">⏸ Intervalo</span>`;
-            watch.innerHTML=playIcon; watch.style.display="block";
-        } else if(now>=secondHalfStart && now<secondHalfMax){
-            let liveM=Math.floor((now-secondHalfStart)/60000)+(45+5);
-            if(liveM>=90){ let extra=liveM-90; timer.innerText=`2º TEMPO - 90+${extra}' (Acréscimos)`;}
-            else timer.innerText=`2º TEMPO - ${liveM}'`;
-            watch.innerHTML=playIcon; watch.style.display="block";
-        } else { timer.innerText='FIM DE JOGO'; timer.style.color='red'; watch.style.display="none"; }
-    });
-}
-
-function showPlayer(index, playerIndex=0){
-    let card=document.getElementById(`matchCard-${index}`);
-    let container=document.getElementById(`matchPlayerContainer-${index}`);
-    let player=document.getElementById(`matchPlayer-${index}`);
-    let btns=document.getElementById(`playerBtns-${index}`);
-    let closeBtn=document.getElementById(`closeBtn-${index}`);
-    let popup=document.getElementById(`popup-${index}`);
-    const now=new Date();
-    const startTime = new Date(matches[index].time);
-    const secondHalfMax = new Date(startTime.getTime()+70*60000+15*60000);
-    if(now<startTime){ popup.innerHTML="⚠ Esse jogo não começou!"; popup.style.display="block"; setTimeout(()=>popup.style.display="none",3000); return;}
-    if(now>=secondHalfMax){ popup.innerHTML="⚠ Esse jogo já terminou!"; popup.style.display="block"; setTimeout(()=>popup.style.display="none",3000); return;}
-    card.style.display='none'; container.style.display='block';
-    player.innerHTML=`<iframe class="iframe-player" src="${matches[index].playerUrls[playerIndex]}" frameborder="0" allowfullscreen></iframe>`;
-    btns.style.display='block'; closeBtn.style.display='block';
-}
-
-function closePlayer(index){
-    let card=document.getElementById(`matchCard-${index}`);
-    let container=document.getElementById(`matchPlayerContainer-${index}`);
-    let player=document.getElementById(`matchPlayer-${index}`);
-    let btns=document.getElementById(`playerBtns-${index}`);
-    player.innerHTML=''; btns.style.display='none'; card.style.display='flex'; container.style.display='none';
-}
-
-function generateMatchCards(){
-    let container=document.getElementById('matchesContainer');
-    matches.forEach((match,index)=>{
-        let wrapper=document.createElement('div');
-        wrapper.classList.add('card-wrapper');
-        wrapper.innerHTML=`
-<div class="match-card" id="matchCard-${index}" onclick="showPlayer(${index},0)">
-    <div class="teams">
-        <div><img src="${match.imageHome}"><p class="team-name">${match.teams[0]}</p></div>
-        <span style="font-size:20px;font-weight:bold;color:#000">VS</span>
-        <div><img src="${match.imageAway}"><p class="team-name">${match.teams[1]}</p></div>
-    </div>
-    <p>${match.championship}</p>
-    <p id="timer-${index}" class="countdown">Aguardando...</p>
-    <div class="popup-message" id="popup-${index}">O jogo ainda não começou!</div>
-</div>
-<div id="matchPlayerContainer-${index}" class="match-player-container">
-    <div id="matchPlayer-${index}"></div>
-    <div id="playerBtns-${index}" class="player-btns">
-        <button class="player-btn" onclick="showPlayer(${index},0)">Player 1</button>
-        <button class="player-btn" onclick="showPlayer(${index},1)">Player 2</button>
-        <button class="player-btn" onclick="showPlayer(${index},2)">Player 3</button>
-    </div>
-    <button id="closeBtn-${index}" class="close-btn" onclick="closePlayer(${index})">Fechar Player</button>
-</div>
+        let playIcon = `
+            <span class="watch-content">
+                <img src="https://static.vecteezy.com/system/resources/previews/030/348/222/non_2x/modern-video-play-button-icon-png.png" class="play-icon">
+                <span>Clique para assistir!</span>
+            </span>
         `;
-        container.appendChild(wrapper);
+
+        if (now < startTime) {
+            let diff = (startTime - now) / 1000;
+            let hours = Math.floor(diff / 3600);
+            let minutes = Math.floor((diff % 3600) / 60);
+            let seconds = Math.floor(diff % 60);
+            timerElement.innerText = `Início em: ${hours}h ${minutes}m ${seconds}s`;
+            watchMessageElement.style.display = "none";
+        } else if (now >= startTime && now < firstHalfEnd) {
+            let liveMinutes = Math.floor((now - startTime) / 60000);
+            timerElement.innerText = `1º TEMPO - ${liveMinutes}'`;
+            watchMessageElement.innerHTML = `${playIcon}`;
+            watchMessageElement.style.display = "block";
+        } else if (now >= firstHalfEnd && now < firstHalfMax) {
+            let extraMinutes = Math.floor((now - firstHalfEnd) / 60000) + 1;
+            timerElement.innerText = `1º TEMPO - 45+${extraMinutes}' (Acréscimos)`;
+            watchMessageElement.innerHTML = `${playIcon}`;
+            watchMessageElement.style.display = "block";
+        } else if (now >= firstHalfMax && now < halfTimeBreak) {
+            timerElement.innerHTML = `<span style="color: orange; font-weight: bold;">⏸ Intervalo</span>`;
+            watchMessageElement.innerHTML = `${playIcon}`;
+            watchMessageElement.style.display = "block";
+        } else if (now >= secondHalfStart && now < secondHalfMax) {
+            let liveMinutes = Math.floor((now - secondHalfStart) / 60000) + (45 + 5);
+            if (liveMinutes >= 90) {
+                let extraMinutes = liveMinutes - 90;
+                timerElement.innerText = `2º TEMPO - 90+${extraMinutes}' (Acréscimos)`;
+            } else {
+                timerElement.innerText = `2º TEMPO - ${liveMinutes}'`;
+            }
+            watchMessageElement.innerHTML = `${playIcon}`;
+            watchMessageElement.style.display = "block";
+        } else {
+            timerElement.innerText = 'FIM DE JOGO';
+            timerElement.style.color = 'red';
+            watchMessageElement.style.display = "none";
+        }
     });
 }
 
-document.addEventListener("DOMContentLoaded", ()=>{
+function showPlayer(index, playerIndex = 0) {
+    let matchCard = document.getElementById(`matchCard-${index}`);
+    let matchPlayerContainer = document.getElementById(`matchPlayerContainer-${index}`);
+    let matchPlayer = document.getElementById(`matchPlayer-${index}`);
+    let playerBtns = document.getElementById(`playerBtns-${index}`);
+    let closeButton = document.getElementById(`closeBtn-${index}`);
+    let popupMessage = document.getElementById(`popup-${index}`);
+
+    const now = new Date();
+    const startTime = new Date(matches[index].time);
+    const firstHalfEnd = new Date(startTime.getTime() + 45 * 60000);
+    const firstHalfMax = new Date(firstHalfEnd.getTime() + 5 * 60000);
+    const halfTimeBreak = new Date(firstHalfMax.getTime() + 15 * 60000);
+    const secondHalfStart = halfTimeBreak;
+    const secondHalfMax = new Date(secondHalfStart.getTime() + (45 + 5) * 60000);
+
+    if (now < startTime) {
+        let refereeIcon = `<img src="https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-blue-soccer-ball-png-image_10261267.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
+        popupMessage.innerHTML = `${refereeIcon} Esse jogo não começou!`;
+        popupMessage.style.display = "block";
+        popupMessage.style.opacity = "1";
+
+        setTimeout(() => { popupMessage.style.opacity = "0"; setTimeout(() => { popupMessage.style.display = "none"; }, 300); }, 3000);
+        return;
+    }
+
+    if (now >= secondHalfMax) {
+        let refereeIcon = `<img src="https://cdn-icons-png.flaticon.com/512/731/731888.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
+        popupMessage.innerHTML = `${refereeIcon} Esse jogo já terminou!`;
+        popupMessage.style.display = "block";
+        popupMessage.style.opacity = "1";
+
+        setTimeout(() => { popupMessage.style.opacity = "0"; setTimeout(() => { popupMessage.style.display = "none"; }, 300); }, 3000);
+        return;
+    }
+
+    matchCard.style.display = 'none';
+    matchPlayerContainer.style.display = 'block';
+    matchPlayer.innerHTML = `
+        <iframe class="iframe-player" src="${matches[index].playerUrls[playerIndex]}" frameborder="0" allowfullscreen></iframe>
+    `;
+    playerBtns.style.display = 'block';
+    closeButton.style.display = 'block';
+}
+
+function closePlayer(index) {
+    let matchCard = document.getElementById(`matchCard-${index}`);
+    let matchPlayerContainer = document.getElementById(`matchPlayerContainer-${index}`);
+    let matchPlayer = document.getElementById(`matchPlayer-${index}`);
+    let playerBtns = document.getElementById(`playerBtns-${index}`);
+
+    matchPlayer.innerHTML = '';
+    playerBtns.style.display = 'none';
+    matchCard.style.display = 'flex';
+    matchPlayerContainer.style.display = 'none';
+}
+
+function generateMatchCards() {
+    let container = document.getElementById('matchesContainer');
+    matches.forEach((match, index) => {
+        let cardContainer = document.createElement('div');
+        cardContainer.classList.add("card-wrapper");
+        cardContainer.innerHTML =  `
+            <div class="match-card" id="matchCard-${index}" onclick="showPlayer(${index})">
+                <div class="teams">
+                    <div>
+                        <img src="${match.imageHome}" alt="">
+                        <p class="team-name">${match.teams[0]}</p>
+                    </div>
+                    <span style="font-size: 20px; font-weight: bold; color: #000;">VS</span>
+                    <div>
+                        <img src="${match.imageAway}" alt="">
+                        <p class="team-name">${match.teams[1]}</p>
+                    </div>
+                </div>
+                <p>${match.championship}</p>
+                <p id="timer-${index}" class="countdown">Aguardando...</p>
+                <div class="popup-message" id="popup-${index}"> O jogo ainda não começou!</div>
+            </div>
+            <div id="matchPlayerContainer-${index}" class="match-player-container">
+                <div id="matchPlayer-${index}"></div>
+                <div id="playerBtns-${index}" class="player-btns">
+                    <button class="player-btn" onclick="showPlayer(${index}, 0)">Player 1</button>
+                    <button class="player-btn" onclick="showPlayer(${index}, 1)">Player 2</button>
+                    <button class="player-btn" onclick="showPlayer(${index}, 0)">Player 3</button>
+                </div>
+                <button id="closeBtn-${index}" class="close-btn" onclick="closePlayer(${index})">Fechar Player</button>
+            </div>
+        `;
+        container.appendChild(cardContainer);
+    });
+}
+
+// ====== Inicialização ======
+document.addEventListener("DOMContentLoaded", function () {
     generateMatchCards();
-    setInterval(updateCountdown,1000);
+    setInterval(updateCountdown, 1000);
 });
 </script>
 
