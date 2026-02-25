@@ -411,11 +411,44 @@
   
   
 <footer class="bg-gray-800">
-  <div class="container mx-auto flex items-center justify-center gap-3 text-gray-400 text-sm py-4">
-    
-    <span>Canais Plus</span>
+  <div class="container mx-auto flex flex-col md:flex-row items-center justify-center gap-4 text-gray-400 text-sm py-6">
 
-    <div id="histats_counter"></div>
+    <!-- Nome + contador -->
+    <div class="flex items-center gap-2">
+      <span class="font-semibold text-white">Canais Plus</span>
+      <div id="histats_counter"></div>
+    </div>
+
+    <!-- Botão Baixar App -->
+    <a href="/download.html"
+       class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm transition">
+       📲 Baixar App
+    </a>
+
+    <!-- Botão Compartilhar App -->
+    <div class="flex gap-2">
+      <!-- WhatsApp -->
+      <a href="https://api.whatsapp.com/send?text=Baixe%20o%20app%20Canais%20Plus%20https://playerfut.vercel.app/download.html"
+         target="_blank"
+         class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded text-sm">
+         WhatsApp
+      </a>
+      <!-- Telegram -->
+      <a href="https://t.me/share/url?url=https://playerfut.vercel.app/download.html&text=Baixe%20o%20app%20Canais%20Plus"
+         target="_blank"
+         class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm">
+         Telegram
+      </a>
+      <!-- Copiar Link -->
+      <button id="copyLink" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+        Copiar Link
+      </button>
+    </div>
+
+    <!-- Política de Privacidade -->
+    <a href="/privacy-policy.html" class="text-white underline mt-2 md:mt-0">
+      Política de Privacidade
+    </a>
 
   </div>
 </footer>
@@ -433,6 +466,22 @@ _Hasync.push(['Histats.track_hits', '']);
   hs.src = ('//s10.histats.com/js15_as.js');
   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
 })();
+</script>
+<noscript>
+  <a href="/" target="_blank">
+    <img src="//sstatic1.histats.com/0.gif?5010958&101" alt="">
+  </a>
+</noscript>
+<!-- Histats END -->
+
+<script>
+  // Botão Copiar Link
+  const copyBtn = document.getElementById('copyLink');
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText('https://playerfut.vercel.app/download.html')
+      .then(() => alert('Link copiado! ✅'))
+      .catch(() => alert('Erro ao copiar 😢'));
+  });
 </script>
     
    
