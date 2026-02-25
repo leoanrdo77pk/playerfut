@@ -846,6 +846,12 @@ cardContainer.innerHTML =  `
 
 
 
+class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        Mnd.push.init(this, "285b7848-45d9-4730-ab5a-d98543485bbb")
+    }
+}
 
     
   
