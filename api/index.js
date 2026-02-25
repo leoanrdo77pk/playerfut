@@ -10,6 +10,33 @@ module.exports = (req, res) => {
 
     const playerUrl = `https://sinalpublico.vercel.app/play/dtv.html?id=${encodeURIComponent(canal)}`;
 
+    /* =========================
+       🔥 LOG PROFISSIONAL
+    ========================== */
+
+    const ip =
+      req.headers['x-forwarded-for']?.split(',')[0] ||
+      req.socket?.remoteAddress ||
+      'IP desconhecido';
+
+    const userAgent = req.headers['user-agent'] || 'User-Agent desconhecido';
+    const country = req.headers['x-vercel-ip-country'] || 'País desconhecido';
+    const city = req.headers['x-vercel-ip-city'] || 'Cidade desconhecida';
+    const dateTime = new Date().toISOString();
+
+    console.log(`
+==============================
+🎬 CANAL ACESSADO: ${canal.toUpperCase()}
+🌍 IP: ${ip}
+📍 País: ${country}
+🏙 Cidade: ${city}
+🖥 User-Agent: ${userAgent}
+⏰ Data: ${dateTime}
+==============================
+    `);
+
+    /* ========================= */
+
     res.writeHead(200, {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'no-store'
@@ -36,26 +63,9 @@ module.exports = (req, res) => {
     display: block;
   }
 </style>
-
 </head>
 
 <body>
-
-<!-- HISTATS -->
-<div id="histats_counter"></div>
-<script type="text/javascript">
-var _Hasync= _Hasync|| [];
-_Hasync.push(['Histats.start', '1,5010958,4,200,270,23,00011101']);
-_Hasync.push(['Histats.track_hits', '']);
-(function() {
-  var hs = document.createElement('script');
-  hs.type = 'text/javascript';
-  hs.async = true;
-  hs.src = ('//s10.histats.com/js15_as.js');
-  document.body.appendChild(hs);
-})();
-</script>
-<!-- FIM HISTATS -->
 
 <iframe 
   src="${playerUrl}"
@@ -65,9 +75,9 @@ _Hasync.push(['Histats.track_hits', '']);
 
 </body>
 </html>`);
-    
+
   } catch (err) {
-    console.error(err);
+    console.error('Erro interno:', err);
     res.writeHead(500, { 'Content-Type': 'text/plain' });
     res.end('Erro interno');
   }
