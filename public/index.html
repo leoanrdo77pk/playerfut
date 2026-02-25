@@ -230,7 +230,181 @@
         color: #333};
       }
     </style>
+    
+<style>
 
+  
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .matches-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .match-card {
+            width: 100%;
+            height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-align: center;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .match-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .teams {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .teams div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .teams img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .team-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .countdown {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #0b2754;
+        }
+
+
+        .match-player-container {
+            width: 100%;
+            height: 360px;
+            display: none;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .iframe-player {
+            width: 100%;
+            height: 300px;
+            border: none;
+        }
+
+        .popup-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+            z-index: 10;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .close-btn {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .player-btns {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .player-btn {
+            padding: 5px 10px;
+            margin: 5px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            background: #0b2754;
+            color: white;
+        }
+  
+  
+  .watch-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.watch-content {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* espaço entre ícone e texto */
+    cursor: pointer;
+}
+
+.play-icon {
+    width: 18px;
+    height: 18px;
+}
+
+        @media (max-width: 900px) {
+            .matches-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .matches-container {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+  
+
+</style>
 </head>
 
 <body class="bg-gray-900 text-white font-sans min-h-screen flex flex-col">
@@ -275,6 +449,16 @@ _Hasync.push(['Histats.track_hits', '']);
 </noscript>
 <!-- Histats END -->
 
+<script>
+  // Botão Copiar Link
+  const copyBtn = document.getElementById('copyLink');
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText('https://playerfut.vercel.app/download.html')
+      .then(() => alert('Link copiado! ✅'))
+      .catch(() => alert('Erro ao copiar 😢'));
+  });
+</script>
+    
    
       <div class="space-y-4">
         <h2
@@ -285,175 +469,9 @@ _Hasync.push(['Histats.track_hits', '']);
         </h2>
 
 
-<!-- Jogos de Hoje -->
 <div id="matchesContainer" class="matches-container"></div>
 
-<!-- ESTILO DOS JOGOS DE HOJE -->
-<style>
-.matches-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-    max-width: 1200px;
-    width: 100%;
-    margin-bottom: 30px;
-}
 
-.match-card {
-    width: 100%;
-    height: 200px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    text-align: center;
-    padding: 15px;
-    cursor: pointer;
-}
-
-.match-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.teams {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 10px;
-}
-
-.teams div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.teams img {
-    width: 60px;
-    height: 60px;
-}
-
-.team-name {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    margin-top: 5px;
-}
-
-.countdown {
-    font-size: 14px;
-    font-weight: bold;
-    margin-top: 10px;
-    color: #0b2754;
-}
-
-.match-player-container {
-    width: 100%;
-    height: 360px;
-    display: none;
-    text-align: center;
-    margin-bottom: 30px;
-    position: relative;
-}
-
-.iframe-player {
-    width: 100%;
-    height: 300px;
-    border: none;
-}
-
-.popup-message {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 14px;
-    text-align: center;
-    display: none;
-    z-index: 10;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.close-btn {
-    display: none;
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    background: red;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    text-align: center;
-}
-
-.player-btns {
-    margin-top: 10px;
-    display: none;
-}
-
-.player-btn {
-    padding: 5px 10px;
-    margin: 5px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    background: #0b2754;
-    color: white;
-}
-
-.watch-message {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 6px;
-}
-
-.watch-content {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.play-icon {
-    width: 18px;
-    height: 18px;
-}
-
-@media (max-width: 900px) {
-    .matches-container { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 600px) {
-    .matches-container { grid-template-columns: repeat(1, 1fr); }
-}
-</style>
-        
-
-       
-        
-        
-               
-        
-        
-        
-        
- 
-
-
-<!-- JS COMPLETO DOS JOGOS -->
 <script>
 const matches = [
 
@@ -631,22 +649,8 @@ const matches = [
 
 ];
 
-  
-  
- // ====== Função da Tab ======
-function toggleJogosHoje() {
-    const tab = document.getElementById('jogosHojeTab');
-    if(tab.style.display === 'none' || tab.style.display === '') {
-        tab.style.display = 'block';
-    } else {
-        tab.style.display = 'none';
-    }
-}
-       
-         
-  
-  
-  
+
+
 function updateCountdown() {
     const now = new Date();
     matches.forEach((match, index) => {
@@ -671,12 +675,13 @@ function updateCountdown() {
             timerElement.parentNode.appendChild(watchMessageElement);
         }
 
+        // Ícone de play preto e branco
         let playIcon = `
-            <span class="watch-content">
-                <img src="https://static.vecteezy.com/system/resources/previews/030/348/222/non_2x/modern-video-play-button-icon-png.png" class="play-icon">
-                <span>Clique para assistir!</span>
-            </span>
-        `;
+    <span class="watch-content">
+        <img src="https://static.vecteezy.com/system/resources/previews/030/348/222/non_2x/modern-video-play-button-icon-png.png" class="play-icon">
+        <span>Clique para assistir!</span>
+    </span>
+`;
 
         if (now < startTime) {
             let diff = (startTime - now) / 1000;
@@ -717,6 +722,8 @@ function updateCountdown() {
     });
 }
 
+
+
 function showPlayer(index, playerIndex = 0) {
     let matchCard = document.getElementById(`matchCard-${index}`);
     let matchPlayerContainer = document.getElementById(`matchPlayerContainer-${index}`);
@@ -733,88 +740,107 @@ function showPlayer(index, playerIndex = 0) {
     const secondHalfStart = halfTimeBreak;
     const secondHalfMax = new Date(secondHalfStart.getTime() + (45 + 5) * 60000);
 
+    // Se o jogo ainda não começou
     if (now < startTime) {
         let refereeIcon = `<img src="https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-blue-soccer-ball-png-image_10261267.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
         popupMessage.innerHTML = `${refereeIcon} Esse jogo não começou!`;
         popupMessage.style.display = "block";
         popupMessage.style.opacity = "1";
 
-        setTimeout(() => { popupMessage.style.opacity = "0"; setTimeout(() => { popupMessage.style.display = "none"; }, 300); }, 3000);
+        setTimeout(() => {
+            popupMessage.style.opacity = "0";
+            setTimeout(() => { popupMessage.style.display = "none"; }, 300);
+        }, 3000);
         return;
     }
 
+    // Se o jogo já terminou
     if (now >= secondHalfMax) {
         let refereeIcon = `<img src="https://cdn-icons-png.flaticon.com/512/731/731888.png" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">`;
         popupMessage.innerHTML = `${refereeIcon} Esse jogo já terminou!`;
         popupMessage.style.display = "block";
         popupMessage.style.opacity = "1";
 
-        setTimeout(() => { popupMessage.style.opacity = "0"; setTimeout(() => { popupMessage.style.display = "none"; }, 300); }, 3000);
+        setTimeout(() => {
+            popupMessage.style.opacity = "0";
+            setTimeout(() => { popupMessage.style.display = "none"; }, 300);
+        }, 3000);
         return;
     }
 
+    // ✅ Abre apenas iframe normal (SEM HLS / SEM m3u8)
     matchCard.style.display = 'none';
     matchPlayerContainer.style.display = 'block';
+    matchPlayer.innerHTML = '';
+
     matchPlayer.innerHTML = `
-        <iframe class="iframe-player" src="${matches[index].playerUrls[playerIndex]}" frameborder="0" allowfullscreen></iframe>
+        <iframe 
+            class="iframe-player" 
+            src="${matches[index].playerUrls[playerIndex]}" 
+            frameborder="0" 
+            allowfullscreen>
+        </iframe>
     `;
+
     playerBtns.style.display = 'block';
     closeButton.style.display = 'block';
 }
 
-function closePlayer(index) {
-    let matchCard = document.getElementById(`matchCard-${index}`);
-    let matchPlayerContainer = document.getElementById(`matchPlayerContainer-${index}`);
-    let matchPlayer = document.getElementById(`matchPlayer-${index}`);
-    let playerBtns = document.getElementById(`playerBtns-${index}`);
 
-    matchPlayer.innerHTML = '';
-    playerBtns.style.display = 'none';
-    matchCard.style.display = 'flex';
-    matchPlayerContainer.style.display = 'none';
-}
 
-function generateMatchCards() {
-    let container = document.getElementById('matchesContainer');
-    matches.forEach((match, index) => {
-        let cardContainer = document.createElement('div');
-        cardContainer.classList.add("card-wrapper");
-        cardContainer.innerHTML =  `
-            <div class="match-card" id="matchCard-${index}" onclick="showPlayer(${index})">
-                <div class="teams">
-                    <div>
-                        <img src="${match.imageHome}" alt="">
-                        <p class="team-name">${match.teams[0]}</p>
+    function closePlayer(index) {
+        let matchCard = document.getElementById(`matchCard-${index}`);
+        let matchPlayerContainer = document.getElementById(`matchPlayerContainer-${index}`);
+        let matchPlayer = document.getElementById(`matchPlayer-${index}`);
+        let playerBtns = document.getElementById(`playerBtns-${index}`);
+
+        matchPlayer.innerHTML = '';
+        playerBtns.style.display = 'none';
+        matchCard.style.display = 'flex';
+        matchPlayerContainer.style.display = 'none';
+    }
+
+    function generateMatchCards() {
+        let container = document.getElementById('matchesContainer');
+        matches.forEach((match, index) => {
+            let cardContainer = document.createElement('div');
+cardContainer.classList.add("card-wrapper");
+cardContainer.innerHTML =  `
+                <div class="match-card" id="matchCard-${index}" onclick="showPlayer(${index})">
+                    <div class="teams">
+                        <div>
+                            <img src="${match.imageHome}" alt="">
+                            <p class="team-name">${match.teams[0]}</p>
+                        </div>
+                        <span style="font-size: 20px; font-weight: bold; color: #000;">VS</span>
+                        <div>
+                            <img src="${match.imageAway}" alt="">
+                            <p class="team-name">${match.teams[1]}</p>
+                        </div>
                     </div>
-                    <span style="font-size: 20px; font-weight: bold; color: #000;">VS</span>
-                    <div>
-                        <img src="${match.imageAway}" alt="">
-                        <p class="team-name">${match.teams[1]}</p>
+                    <p>${match.championship}</p>
+                    <p id="timer-${index}" class="countdown">Aguardando...</p>
+                    <div class="popup-message" id="popup-${index}"> O jogo ainda não começou!</div>
+                </div>
+                <div id="matchPlayerContainer-${index}" class="match-player-container">
+                    <div id="matchPlayer-${index}"></div>
+                    <div id="playerBtns-${index}" class="player-btns">
+                        <button class="player-btn" onclick="showPlayer(${index}, 0)">Player 1</button>
+                        <button class="player-btn" onclick="showPlayer(${index}, 1)">Player 2</button>
+                        <button class="player-btn" onclick="showPlayer(${index}, 0)">Player 3</button>
+                      
                     </div>
+                    <button id="closeBtn-${index}" class="close-btn" onclick="closePlayer(${index})">Fechar Player</button>
                 </div>
-                <p>${match.championship}</p>
-                <p id="timer-${index}" class="countdown">Aguardando...</p>
-                <div class="popup-message" id="popup-${index}"> O jogo ainda não começou!</div>
-            </div>
-            <div id="matchPlayerContainer-${index}" class="match-player-container">
-                <div id="matchPlayer-${index}"></div>
-                <div id="playerBtns-${index}" class="player-btns">
-                    <button class="player-btn" onclick="showPlayer(${index}, 0)">Player 1</button>
-                    <button class="player-btn" onclick="showPlayer(${index}, 1)">Player 2</button>
-                    <button class="player-btn" onclick="showPlayer(${index}, 0)">Player 3</button>
-                </div>
-                <button id="closeBtn-${index}" class="close-btn" onclick="closePlayer(${index})">Fechar Player</button>
-            </div>
-        `;
-        container.appendChild(cardContainer);
+            `;
+            container.appendChild(cardContainer);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        generateMatchCards();
+        setInterval(updateCountdown, 1000);
     });
-}
-
-// ====== Inicialização ======
-document.addEventListener("DOMContentLoaded", function () {
-    generateMatchCards();
-    setInterval(updateCountdown, 1000);
-});
 </script>
 
 
