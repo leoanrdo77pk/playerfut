@@ -255,13 +255,17 @@
         }
 
         .matches-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            max-width: 1200px;
-            width: 100%;
-            margin-bottom: 30px;
-        }
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 20px;
+    padding-bottom: 10px;
+}
+
+.match-card {
+    min-width: 280px;
+    flex: 0 0 auto;
+}
 
         .match-card {
             width: 100%;
@@ -479,7 +483,7 @@ const matches = [
 
     {
         "teams": ["BOU","SUN"],
-        "time": "2026-02-28T09:30:00",
+        "time": "2026-02-28T00:15:00",
         "imageHome": "https://storage.livescore.com/images/team/medium/enet/8678.png",
         "imageAway": "https://storage.livescore.com/images/team/medium/enet/8472.png",
         "championship": "Premier League - Inglaterra",
@@ -487,7 +491,12 @@ const matches = [
             "https://rdcanais.top/espn",
             "https://sinalpublico.vercel.app/play/dtv.html?id=espn1",
           "https://sinalpublico.vercel.app/play/dtv.html?id=disneyplus1"
-        ]
+        ],
+
+    "extraFirstHalf": 5,
+    "extraSecondHalf": 6,
+    "hasExtraTime": true,
+    "hasPenalties": true
     },
 
     {
@@ -501,7 +510,12 @@ const matches = [
             "https://sinalpublico.vercel.app/play/dtv.html?id=espn2",
             "https://sinalpublico.vercel.app/play/dtv.html?id=disneyplus2"
           
-        ]
+        ],
+
+    "extraFirstHalf": 5,
+    "extraSecondHalf": 6,
+    "hasExtraTime": true,
+    "hasPenalties": true
     },
 
     {
@@ -834,28 +848,28 @@ const matches = [
 
 function updateCountdown() {
     const now = new Date();
+
     matches.forEach((match, index) => {
+
         const startTime = new Date(match.time);
+
+        const extraFirst = match.extraFirstHalf || 5;
+        const extraSecond = match.extraSecondHalf || 5;
+
         const firstHalfEnd = new Date(startTime.getTime() + 45 * 60000);
-        const firstHalfMax = new Date(firstHalfEnd.getTime() + 5 * 60000);
+        const firstHalfMax = new Date(firstHalfEnd.getTime() + extraFirst * 60000);
+
         const halfTimeBreak = new Date(firstHalfMax.getTime() + 15 * 60000);
-        const secondHalfStart = halfTimeBreak;
-        const secondHalfMax = new Date(secondHalfStart.getTime() + (45 + 5) * 60000);
+
+        const secondHalfEnd = new Date(halfTimeBreak.getTime() + 45 * 60000);
+        const secondHalfMax = new Date(secondHalfEnd.getTime() + extraSecond * 60000);
+
+        const extraTimeStart = secondHalfMax;
+        const extraTimeEnd = new Date(extraTimeStart.getTime() + 30 * 60000);
 
         let timerElement = document.getElementById(`timer-${index}`);
-        let watchMessageElement = document.getElementById(`watchMessage-${index}`);
-
-        if (!watchMessageElement) {
-            watchMessageElement = document.createElement("p");
-            watchMessageElement.id = `watchMessage-${index}`;
-            watchMessageElement.className = "watch-message";
-            watchMessageElement.style.color = "#4CAF50";
-            watchMessageElement.style.fontWeight = "bold";
-            watchMessageElement.style.marginTop = "10px";
-            watchMessageElement.style.display = "none";
-            timerElement.parentNode.appendChild(watchMessageElement);
-        }
-
+      if (!timerElement) return;
+      
         // Ícone de play preto e branco
         let playIcon = `
     <span class="watch-content">
@@ -863,6 +877,9 @@ function updateCountdown() {
         <span>Clique para assistir!</span>
     </span>
 `;
+      
+      
+        
 
         if (now < startTime) {
             let diff = (startTime - now) / 1000;
@@ -870,38 +887,51 @@ function updateCountdown() {
             let minutes = Math.floor((diff % 3600) / 60);
             let seconds = Math.floor(diff % 60);
             timerElement.innerText = `Início em: ${hours}h ${minutes}m ${seconds}s`;
-            watchMessageElement.style.display = "none";
-        } else if (now >= startTime && now < firstHalfEnd) {
-            let liveMinutes = Math.floor((now - startTime) / 60000);
-            timerElement.innerText = `1º TEMPO - ${liveMinutes}'`;
-            watchMessageElement.innerHTML = `${playIcon}`;
-            watchMessageElement.style.display = "block";
-        } else if (now >= firstHalfEnd && now < firstHalfMax) {
-            let extraMinutes = Math.floor((now - firstHalfEnd) / 60000) + 1;
-            timerElement.innerText = `1º TEMPO - 45+${extraMinutes}' (Acréscimos)`;
-            watchMessageElement.innerHTML = `${playIcon}`;
-            watchMessageElement.style.display = "block";
-        } else if (now >= firstHalfMax && now < halfTimeBreak) {
-            timerElement.innerHTML = `<span style="color: orange; font-weight: bold;">⏸ Intervalo</span>`;
-            watchMessageElement.innerHTML = `${playIcon}`;
-            watchMessageElement.style.display = "block";
-        } else if (now >= secondHalfStart && now < secondHalfMax) {
-            let liveMinutes = Math.floor((now - secondHalfStart) / 60000) + (45 + 5);
-            if (liveMinutes >= 90) {
-                let extraMinutes = liveMinutes - 90;
-                timerElement.innerText = `2º TEMPO - 90+${extraMinutes}' (Acréscimos)`;
-            } else {
-                timerElement.innerText = `2º TEMPO - ${liveMinutes}'`;
-            }
-            watchMessageElement.innerHTML = `${playIcon}`;
-            watchMessageElement.style.display = "block";
-        } else {
-            timerElement.innerText = 'FIM DE JOGO';
-            timerElement.style.color = 'red';
-            watchMessageElement.style.display = "none";
+        }
+
+        else if (now >= startTime && now < firstHalfEnd) {
+            let live = Math.floor((now - startTime) / 60000);
+            timerElement.innerText = `1º TEMPO - ${live}'`;
+        }
+
+        else if (now >= firstHalfEnd && now < firstHalfMax) {
+            let extra = Math.floor((now - firstHalfEnd) / 60000) + 1;
+            timerElement.innerText = `1º TEMPO - 45+${extra}' (Acréscimos)`;
+        }
+
+        else if (now >= firstHalfMax && now < halfTimeBreak) {
+            timerElement.innerHTML = `⏸ INTERVALO`;
+        }
+
+        else if (now >= halfTimeBreak && now < secondHalfEnd) {
+            let live = Math.floor((now - halfTimeBreak) / 60000) + 45;
+            timerElement.innerText = `2º TEMPO - ${live}'`;
+        }
+
+        else if (now >= secondHalfEnd && now < secondHalfMax) {
+            let extra = Math.floor((now - secondHalfEnd) / 60000) + 1;
+            timerElement.innerText = `2º TEMPO - 90+${extra}' (Acréscimos)`;
+        }
+
+        else if (match.hasExtraTime && now >= secondHalfMax && now < extraTimeEnd) {
+            let extraMin = Math.floor((now - secondHalfMax) / 60000);
+            timerElement.innerText = `PRORROGAÇÃO - ${extraMin}'`;
+        }
+
+        else if (match.hasPenalties && now >= extraTimeEnd) {
+            timerElement.innerText = `⚽ DISPUTA DE PÊNALTIS`;
+        }
+
+        else {
+            timerElement.innerText = `FIM DE JOGO`;
+            timerElement.style.color = "red";
         }
     });
 }
+
+      
+
+      
 
 
 
